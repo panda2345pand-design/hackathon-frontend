@@ -35,6 +35,8 @@ export interface ItemDetail extends ItemSummary {
   brand: string | null
   predicted_price: number | null
   cluster_label: string | null
+  /** AI ジャンルの日本語名。バックエンドが返さないこともある */
+  cluster_label_ja?: string | null
   seller: UserRef
   liked: boolean
 }
@@ -85,6 +87,8 @@ export interface PriceEstimate {
 export interface Cluster {
   id: number
   label: string
+  /** 日本語の名前。バックエンドが返さないこともあるので、無ければ label を出す */
+  label_ja?: string | null
   count: number
 }
 
@@ -105,6 +109,7 @@ export interface ItemListResponse {
 export interface SimilarItemsResponse {
   cluster_id: number | null
   cluster_label: string | null
+  cluster_label_ja?: string | null
   items: ItemSummary[]
 }
 

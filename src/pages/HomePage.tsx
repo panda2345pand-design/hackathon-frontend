@@ -23,7 +23,7 @@ import { ItemGrid, ItemGridSkeleton } from '../components/ItemGrid'
 import { PAGE_SIZE } from '../config'
 import { notifyError } from '../lib/errors'
 import { formatCount } from '../lib/format'
-import { categoryLabel } from '../lib/labels'
+import { categoryLabel, clusterLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { ItemStatus, ItemSummary } from '../types'
 
@@ -231,7 +231,7 @@ export function HomePage() {
                     size="sm"
                     style={{ flexShrink: 0 }}
                   >
-                    {c.label}({formatCount(c.count)})
+                    {clusterLabel(c.label, c.label_ja)}({formatCount(c.count)})
                   </Chip>
                 ))}
               </Group>

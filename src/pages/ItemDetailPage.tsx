@@ -28,7 +28,7 @@ import { PriceEstimatePanel } from '../components/PriceEstimatePanel'
 import { PurchaseModal } from '../components/PurchaseModal'
 import { notifyError, notifySuccess } from '../lib/errors'
 import { formatDate, formatPrice } from '../lib/format'
-import { categoryLabel, conditionLabel } from '../lib/labels'
+import { categoryLabel, clusterLabel, conditionLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { Offer, Order } from '../types'
 
@@ -62,7 +62,7 @@ function SimilarItems({ itemId }: { itemId: string }) {
         </Title>
         {similar.data?.cluster_label && (
           <Badge variant="light" leftSection={<IconSparkles size={12} aria-hidden />}>
-            AI ジャンル:{similar.data.cluster_label}
+            AI ジャンル:{clusterLabel(similar.data.cluster_label, similar.data.cluster_label_ja)}
           </Badge>
         )}
       </Group>
