@@ -140,3 +140,10 @@ describe('LoginPage(dev モード)', () => {
     expect(signInDev).toHaveBeenCalledWith('たろう')
   })
 })
+
+describe('LoginPage(お試し用アカウント)', () => {
+  it('設定が無いときは、お試しのボタンを出さない', () => {
+    renderLogin()
+    expect(screen.queryByText('登録せずに試す')).not.toBeInTheDocument()
+  })
+})

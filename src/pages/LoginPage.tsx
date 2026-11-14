@@ -2,6 +2,8 @@ import {
   Alert,
   Button,
   Center,
+  Divider,
+  Group,
   Loader,
   Paper,
   PasswordInput,
@@ -14,6 +16,7 @@ import {
 import { type FormEvent, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/context'
+import { DEMO_ACCOUNTS, DEMO_PASSWORD, type DemoAccount } from '../config'
 import { errorMessage } from '../lib/errors'
 
 type Tab = 'signin' | 'signup'
@@ -44,6 +47,21 @@ export function LoginPage() {
   }, [status, target, navigate])
 
   const needsName = mode === 'dev' || tab === 'signup'
+
+  // お試し用アカウントで入る(登録の手間なしで AI 機能まで届くようにする)
+  const [demoBusy, setDemoBusy] = useState<DemoAccount['key'] | null>(null)
+  const signInDemo = async (account: DemoAccount) => {
+    setError(null)
+    setDemoBusy(account.key)
+    try {
+      await signInWithEmail(account.email, DEMO_PASSWORD)
+    } catch (e) {
+      setError(errorMessage(e))
+    } finally {
+      setDemoBusy(null)
+    }
+  }
+  const showDemo = mode === 'firebase' && DEMO_ACCOUNTS.length > 0
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -154,6 +172,38 @@ export function LoginPage() {
             <Button type="submit" loading={submitting} fullWidth>
               {mode === 'firebase' && tab === 'signup' ? '登録してはじめる' : 'ログイン'}
             </Button>
+
+            {showDemo && (
+              <>
+                <Divider label="登録せずに試す" labelPosition="center" />
+                <Text size="xs" c="dimmed">
+                  お試し用の共用アカウントです。ほかの人も同じアカウントを使います。
+                </Text>
+                <Group grow gap="sm" align="stretch">
+                  {DEMO_ACCOUNTS.map((account) => (
+                    <Button
+                      key={account.key}
+                      variant="light"
+                      h="auto"
+                      py="xs"
+                      loading={demoBusy === account.key}
+                      disabled={submitting || (demoBusy !== null && demoBusy !== account.key)}
+                      onClick={() => signInDemo(account)}
+                      aria-label={`${account.label}(${account.hint})`}
+                    >
+                      <Stack gap={2} align="center">
+                        <Text size="sm" fw={700}>
+                          {account.label}
+                        </Text>
+                        <Text size="xs" style={{ whiteSpace: 'normal' }}>
+                          {account.hint}
+                        </Text>
+                      </Stack>
+                    </Button>
+                  ))}
+                </Group>
+              </>
+            )}
           </Stack>
         </form>
       </Paper>
