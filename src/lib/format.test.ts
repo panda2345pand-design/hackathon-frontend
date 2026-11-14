@@ -38,6 +38,13 @@ describe('formatDate', () => {
     expect(formatDate('2026-11-14T12:00:00')).toBe('2026/11/14')
   })
 
+  it('タイムゾーンの印がない時刻は UTC として読み、日本時間の日付で出す', () => {
+    // UTC の 11/14 18:15 は、日本では 11/15 の 3:15
+    expect(formatDate('2026-11-14T18:15:40')).toBe('2026/11/15')
+    expect(formatDate('2026-11-14T18:15:40Z')).toBe('2026/11/15')
+    expect(formatDate('2026-11-15T03:15:40+09:00')).toBe('2026/11/15')
+  })
+
   it('読めない値は空文字にする', () => {
     expect(formatDate('')).toBe('')
     expect(formatDate('not a date')).toBe('')

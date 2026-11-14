@@ -14,15 +14,19 @@ export function formatCount(value: number | null | undefined): string {
   return yen.format(value)
 }
 
-/** ISO 8601 の日時を「2026/11/14」の形にする。読めないときは空文字 */
+const tokyoDate = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' })
+
+/**
+ * ISO 8601 の日時を「2026/11/14」の形(日本時間)にする。読めないときは空文字。
+ * サーバーは UTC の時刻をタイムゾーンの印なしで返す。印がない文字列をそのまま Date に渡すと「この端末の時刻」と解釈されて
+ * 9 時間ずれ、日本の朝 9 時より前の出品が前の日付で表示された(2026-11-15 に本番で確認)。印がなければ UTC として読む。
+ */
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return ''
-  const date = new Date(iso)
+  const hasZone = /(Z|[+-]\d{2}:?\d{2})$/i.test(iso)
+  const date = new Date(hasZone || !iso.includes('T') ? iso : `${iso}Z`)
   if (Number.isNaN(date.getTime())) return ''
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}/${m}/${d}`
+  return tokyoDate.format(date)
 }
 
 /** 入力欄の値を正の整数(円)にする。正の整数でなければ null */
