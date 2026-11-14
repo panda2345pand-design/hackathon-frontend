@@ -1,5 +1,5 @@
 import { Badge, Box, Card, Group, Skeleton, Text } from '@mantine/core'
-import { IconHeart } from '@tabler/icons-react'
+import { IconHeart, IconSparkles } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { formatPrice } from '../lib/format'
 import { conditionLabel } from '../lib/labels'
@@ -8,6 +8,9 @@ import { ItemImage } from './ItemImage'
 
 export function ItemCard({ item }: { item: ItemSummary }) {
   const sold = item.status === 'sold'
+  // あとから足した項目なので、古い応答に無いときは「付いていない」として扱う
+  const negotiable = item.auto_negotiation === true && !sold
+  const aiImage = item.image_ai_generated === true && Boolean(item.image_url)
   return (
     <Card
       component={Link}
@@ -15,7 +18,7 @@ export function ItemCard({ item }: { item: ItemSummary }) {
       withBorder
       padding="sm"
       className="item-card"
-      aria-label={`${item.title} ${formatPrice(item.price)}${sold ? ' 売り切れ' : ''}`}
+      aria-label={`${item.title} ${formatPrice(item.price)}${sold ? ' 売り切れ' : ''}${negotiable ? ' AI 交渉可' : ''}`}
       h="100%"
     >
       <Card.Section pos="relative">
@@ -24,7 +27,25 @@ export function ItemCard({ item }: { item: ItemSummary }) {
         </Box>
         {sold && (
           <Badge color="dark" radius="sm" pos="absolute" top={8} left={8}>
-            SOLD
+            売り切れ
+          </Badge>
+        )}
+        {negotiable && (
+          <Badge
+            radius="sm"
+            size="sm"
+            pos="absolute"
+            top={8}
+            left={8}
+            leftSection={<IconSparkles size={11} aria-hidden />}
+          >
+            AI 交渉可
+          </Badge>
+        )}
+        {aiImage && (
+          // 実物の写真ではないことを、じゃまにならない大きさで角に出す
+          <Badge color="dark" variant="filled" radius="sm" size="xs" pos="absolute" bottom={6} right={6} opacity={0.8}>
+            AI 画像
           </Badge>
         )}
       </Card.Section>

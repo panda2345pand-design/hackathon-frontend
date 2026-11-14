@@ -25,9 +25,11 @@ export function setTokenProvider(provider: TokenProvider): void {
 type QueryValue = string | number | null | undefined
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   query?: Record<string, QueryValue>
   body?: unknown
+  /** ファイルを送るとき(multipart/form-data)。body とは同時に使わない */
+  formData?: FormData
   signal?: AbortSignal
 }
 
@@ -36,7 +38,10 @@ const FALLBACK_MESSAGES: Record<number, string> = {
   403: 'この操作をする権限がありません',
   404: '見つかりませんでした',
   409: 'ほかの操作と重なったため完了できませんでした',
+  413: 'ファイルが大きすぎます',
+  415: 'この種類のファイルは使えません',
   422: '入力内容を確認してください',
+  429: '回数の上限に達しました。時間をおいてお試しください',
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -84,8 +89,9 @@ async function readJson(response: Response): Promise<unknown> {
 
 /** JSON API を呼ぶ。失敗はすべて ApiError で投げる */
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', query, body, signal } = options
+  const { method = 'GET', query, body, formData, signal } = options
   const headers: Record<string, string> = { Accept: 'application/json' }
+  // FormData のときは Content-Type を書かない(区切り文字 boundary つきの値をブラウザが自分で付けるため)
   if (body !== undefined) headers['Content-Type'] = 'application/json'
 
   const token = await tokenProvider()
@@ -96,7 +102,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     response = await fetch(buildUrl(path, query), {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: formData ?? (body === undefined ? undefined : JSON.stringify(body)),
       signal,
     })
   } catch (cause) {

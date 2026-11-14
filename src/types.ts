@@ -1,4 +1,4 @@
-// バックエンドの API 仕様(hackathon-backend/docs/api.md v1)に合わせた型。
+// バックエンドの API 仕様(hackathon-backend/docs/api.md v1 と docs/api-next.md)に合わせた型。
 // 金額はすべて円(整数)、日時は ISO 8601 の文字列。
 
 export type ItemStatus = 'on_sale' | 'sold'
@@ -28,9 +28,16 @@ export interface ItemSummary {
   cluster_id: number | null
   like_count: number
   created_at: string
+  // ↓ あとから足した項目。古い応答には無いことがあるので、無ければ false として扱う
+  /** 出品者が最低価格を設定していて、AI 同士の交渉ができる商品か */
+  auto_negotiation?: boolean
+  /** 見本データ用に AI が作ったイメージ画像か(実物の写真ではない) */
+  image_ai_generated?: boolean
 }
 
 export interface ItemDetail extends ItemSummary {
+  /** AI 交渉の最低価格。出品者本人が読んだときだけ値が入り、ほかの人には必ず null */
+  min_price?: number | null
   description: string
   brand: string | null
   predicted_price: number | null
@@ -123,6 +130,92 @@ export interface DescribeResponse {
   source: AiSource
 }
 
+// ---- AI 同士の価格交渉 ----
+
+export type NegotiationOutcome = 'agreed' | 'no_deal'
+
+/** 1 往復ぶん。買い手の AI の提示と、売り手の AI の提示 */
+export interface NegotiationRound {
+  round: number
+  buyer_offer: number
+  buyer_message: string
+  seller_ask: number
+  seller_message: string
+}
+
+/** AI 同士の交渉の記録。合意するか・いくらかはサーバーの規則が決め、Gemini はせりふだけを書く */
+export interface AutoNegotiation {
+  id: string
+  item_id: string
+  outcome: NegotiationOutcome
+  /** 不成立なら null */
+  agreed_price: number | null
+  list_price: number
+  /** 買い手の上限。買い手本人への応答にだけ入る(出品者には null) */
+  max_price?: number | null
+  rounds: NegotiationRound[]
+  /** 合意したときに作られる承諾済みの交渉(offers)の id */
+  offer_id: string | null
+  source: AiSource
+  /** 合意の決め方の説明(日本語 1〜2 文) */
+  rule: string
+  created_at: string
+  /** 一覧(GET /items/{id}/negotiations)にだけ付く */
+  buyer?: UserRef
+}
+
+// ---- 写真 ----
+
+export interface UploadedImage {
+  id: string
+  url: string
+  content_type: string
+}
+
+/** 写真から読み取った出品内容。自信がない項目は null。Gemini が使えないときは全部 null で source が fallback */
+export interface DescribeImageResponse {
+  title: string | null
+  category: string | null
+  condition: string | null
+  brand: string | null
+  description: string | null
+  source: AiSource
+}
+
+// ---- お知らせ ----
+
+export interface AppNotification {
+  id: string
+  type: string
+  message: string
+  item_id: string | null
+  read: boolean
+  created_at: string
+}
+
+export interface NotificationsResponse {
+  unread_count: number
+  notifications: AppNotification[]
+}
+
+// ---- いいねされやすさ ----
+
+export interface AttentionPricePoint {
+  price: number
+  probability: number
+}
+
+/** モデルが無いときは {available: false} だけが返るので、ほかの項目はすべて任意にしている */
+export interface AttentionResponse {
+  available: boolean
+  probability?: number
+  level?: Acceptance
+  base_rate?: number
+  price_effect?: AttentionPricePoint[]
+  reasons?: string[]
+  metrics?: { auc?: number | null; n_train?: number | null; n_test?: number | null } | null
+}
+
 export interface NegotiateResponse {
   acceptance: Acceptance
   reply: string
@@ -150,6 +243,8 @@ export interface CreateItemInput {
   price: number
   brand?: string
   image_url?: string
+  /** AI 交渉の最低価格(任意)。1 以上 price 以下 */
+  min_price?: number
 }
 
 export interface DescribeInput {
@@ -164,6 +259,14 @@ export interface PriceInput {
   category: string
   condition: string
   brand?: string
+}
+
+export interface AttentionInput {
+  title: string
+  category: string
+  condition: string
+  brand: string | null
+  price: number
 }
 
 export interface CreateOfferInput {

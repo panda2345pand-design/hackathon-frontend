@@ -11,14 +11,15 @@ import {
   IconHanger,
   IconNeedleThread,
   IconPackage,
+  IconPlant2,
   IconSofa,
   type Icon,
 } from '@tabler/icons-react'
 import { useState } from 'react'
 import { categoryLabel } from '../lib/labels'
 
-// 商品写真が無いとき(データセットに写真は無い)は、カテゴリごとに決まった色とアイコンの面を出す。
-// 同じカテゴリは必ず同じ見た目になる。外部の画像は使わない。
+// 商品写真が無いとき、または写真を読み込めなかったときは、カテゴリごとに決まった色とアイコンの面を出す。
+// 同じカテゴリは必ず同じ見た目になる。
 
 const COLORS = ['nego', 'indigo', 'orange', 'grape', 'cyan', 'pink', 'lime', 'blue'] as const
 
@@ -26,6 +27,8 @@ const ICONS: ReadonlyArray<readonly [RegExp, Icon]> = [
   [/家電|スマホ|電子|パソコン|カメラ|electronic|phone|computer|camera/i, IconDeviceMobile],
   [/本|書籍|雑誌|漫画|book|magazine/i, IconBook],
   [/ベビー|キッズ|子ども|子供|baby|kid/i, IconBabyCarriage],
+  // 「Garden & Outdoor」が下の outdoor(スポーツ)に取られないように、先に園芸を見る
+  [/ガーデン|園芸|garden/i, IconPlant2],
   [/スポーツ|アウトドア|sport|outdoor/i, IconBallBasketball],
   [/コスメ|美容|香水|beauty|cosme|makeup/i, IconBrush],
   [/ゲーム|おもちゃ|ホビー|game|toy|hobby/i, IconDeviceGamepad2],

@@ -14,11 +14,12 @@ import {
   Title,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconArrowLeft, IconHeart, IconHeartFilled, IconMessageDollar, IconSparkles } from '@tabler/icons-react'
+import { IconArrowLeft, IconHeart, IconHeartFilled, IconMessageDollar, IconPhotoAi, IconSparkles } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ApiError, getItem, getPriceEstimate, getSimilarItems, likeItem, unlikeItem } from '../api'
+import { ApiError, getItem, getPriceEstimate, getSimilarItems, likeItem, listMyOffers, unlikeItem } from '../api'
 import { useAuth } from '../auth/context'
+import { AutoNegotiateModal } from '../components/AutoNegotiateModal'
 import { EmptyState, ErrorState } from '../components/EmptyState'
 import { ItemCard, ItemCardSkeleton } from '../components/ItemCard'
 import { ItemImage } from '../components/ItemImage'
@@ -26,6 +27,7 @@ import { NegotiateModal } from '../components/NegotiateModal'
 import { OffersPanel } from '../components/OffersPanel'
 import { PriceEstimatePanel } from '../components/PriceEstimatePanel'
 import { PurchaseModal } from '../components/PurchaseModal'
+import { SellerNegotiationPanel } from '../components/SellerNegotiationPanel'
 import { notifyError, notifySuccess } from '../lib/errors'
 import { formatDate, formatPrice } from '../lib/format'
 import { categoryLabel, clusterLabel, conditionLabel } from '../lib/labels'
@@ -112,9 +114,29 @@ function ItemDetailView({ id }: { id: string }) {
 
   const [purchaseOpened, purchase] = useDisclosure(false)
   const [negotiateOpened, negotiate] = useDisclosure(false)
+  const [autoOpened, auto] = useDisclosure(false)
   const [liking, setLiking] = useState(false)
 
   const data = item.data
+  // AI 同士の交渉ができる商品を、ログイン中の買い手が見ているか。
+  // auto_negotiation はあとから足した項目なので、無い(古い応答)ときは false として扱う
+  const canAutoNegotiate =
+    data !== null &&
+    data.auto_negotiation === true &&
+    data.status === 'on_sale' &&
+    user !== null &&
+    user.id !== data.seller.id
+
+  // すでに合意した金額があるか(AI 交渉が合意すると、サーバーが「承諾済みの交渉」を作る)。
+  // ページを開き直しても「合意済み」と出せるように、サーバーから読む。読めなくても、ほかの表示は止めない
+  const myOffers = useApi(
+    () => (canAutoNegotiate ? listMyOffers() : Promise.resolve(null)),
+    `${id}:${user?.id ?? ''}:${canAutoNegotiate}`,
+  )
+  const agreedOffer =
+    canAutoNegotiate && myOffers.data
+      ? myOffers.data.offers.find((offer) => offer.item_id === id && offer.status === 'accepted')
+      : undefined
 
   if (!data) {
     if (item.loading) return <DetailSkeleton />
@@ -163,6 +185,16 @@ function ItemDetailView({ id }: { id: string }) {
     item.reload()
   }
 
+  // 合意済みなら、もう一度 AI 交渉はできない(サーバーも already_agreed で断る)ので、ボタンを出さない。
+  // ログインしていない人にも、AI 交渉できる商品だと分かるようにボタンは見せる(押すとログインへ)
+  const showAutoNegotiate = data.auto_negotiation === true && !agreedOffer
+
+  /** AI 交渉の結果から購入へ: 交渉のモーダルを閉じて、購入の確認を開く(合意額は購入の確認がサーバーから読み直す) */
+  const purchaseAfterAuto = () => {
+    auto.close()
+    purchase.open()
+  }
+
   const onOfferSent = (offer: Offer) => {
     negotiate.close()
     notifySuccess(
@@ -188,10 +220,17 @@ function ItemDetailView({ id }: { id: string }) {
             </Box>
             {sold && (
               <Badge color="dark" size="lg" radius="sm" pos="absolute" top={12} left={12}>
-                SOLD
+                売り切れ
               </Badge>
             )}
           </Paper>
+          {data.image_ai_generated === true && data.image_url && (
+            // 見本データの画像は AI が作ったもの。実物の写真と思われないように、写真のすぐ下に書く
+            <Group gap={6} mt="xs" wrap="nowrap" align="flex-start" c="dimmed">
+              <IconPhotoAi size={16} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden />
+              <Text size="xs">AI が作ったイメージ画像です(実物の写真ではありません)</Text>
+            </Group>
+          )}
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, sm: 7 }}>
@@ -250,9 +289,34 @@ function ItemDetailView({ id }: { id: string }) {
               </Alert>
             ) : (
               <Stack gap="xs">
+                {agreedOffer && (
+                  <Alert variant="light" title={`${formatPrice(agreedOffer.amount)} で交渉が成立しています`}>
+                    出品価格 {formatPrice(data.price)} ではなく、成立した金額で購入できます。
+                  </Alert>
+                )}
+                {showAutoNegotiate && (
+                  <div>
+                    <Button
+                      size="md"
+                      fullWidth
+                      leftSection={<IconSparkles size={18} aria-hidden />}
+                      onClick={() => requireLogin() && auto.open()}
+                    >
+                      AI に交渉を任せる
+                    </Button>
+                    <Text size="xs" c="dimmed" mt={4}>
+                      あなたの AI と出品者の AI が、最大 4 往復で金額を決めます。上限は出品者に見えません。
+                    </Text>
+                  </div>
+                )}
                 <Group grow gap="sm">
-                  <Button size="md" onClick={() => requireLogin() && purchase.open()}>
-                    購入する
+                  {/* 画面でいちばん目立つボタンは 1 つにする。AI 交渉を出しているあいだは、購入を枠線だけにする */}
+                  <Button
+                    size="md"
+                    variant={showAutoNegotiate ? 'outline' : 'filled'}
+                    onClick={() => requireLogin() && purchase.open()}
+                  >
+                    {agreedOffer ? 'この金額で購入する' : '購入する'}
                   </Button>
                   <Button
                     size="md"
@@ -290,12 +354,26 @@ function ItemDetailView({ id }: { id: string }) {
 
       {isSeller && <OffersPanel item={data} onChanged={item.reload} />}
 
+      {/* 古いバックエンド(AI 交渉の項目が無い)では出さない */}
+      {isSeller && data.auto_negotiation !== undefined && (
+        <SellerNegotiationPanel item={data} onItemChanged={item.setData} />
+      )}
+
       <SimilarItems itemId={data.id} />
 
       {!isSeller && user && (
         <>
           <PurchaseModal item={data} opened={purchaseOpened} onClose={purchase.close} onPurchased={onPurchased} />
           <NegotiateModal item={data} opened={negotiateOpened} onClose={negotiate.close} onSent={onOfferSent} />
+          <AutoNegotiateModal
+            item={data}
+            opened={autoOpened}
+            onClose={auto.close}
+            estimate={estimate.data}
+            // 合意すると承諾済みの交渉ができるので、「成立しています」の表示を読み直す
+            onSettled={(result) => result.outcome === 'agreed' && myOffers.reload()}
+            onPurchase={purchaseAfterAuto}
+          />
         </>
       )}
     </Stack>

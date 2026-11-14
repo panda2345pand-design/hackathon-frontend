@@ -1,8 +1,12 @@
 import type {
+  AttentionInput,
+  AttentionResponse,
+  AutoNegotiation,
   CategoriesResponse,
   ClustersResponse,
   CreateItemInput,
   CreateOfferInput,
+  DescribeImageResponse,
   DescribeInput,
   DescribeResponse,
   ItemDetail,
@@ -11,11 +15,13 @@ import type {
   ItemSummary,
   LikeResponse,
   NegotiateResponse,
+  NotificationsResponse,
   Offer,
   Order,
   PriceEstimate,
   PriceInput,
   SimilarItemsResponse,
+  UploadedImage,
   User,
 } from '../types'
 import { request } from './client'
@@ -61,6 +67,36 @@ export const acceptOffer = (offerId: string) =>
 export const rejectOffer = (offerId: string) =>
   request<Offer>(`${offer(offerId)}/reject`, { method: 'POST' })
 
+// ---- AI 同士の価格交渉 ----
+
+/** 最低価格を設定・変更する(null で AI 交渉をやめる)。出品者本人だけ。返り値は商品詳細 */
+export const updateMinPrice = (itemId: string, minPrice: number | null) =>
+  request<ItemDetail>(`${item(itemId)}/min-price`, { method: 'PATCH', body: { min_price: minPrice } })
+
+/** 買い手の上限を自分の AI に預けて、売り手の AI と交渉させる。結果(全往復のやりとり)が一度に返る */
+export const autoNegotiate = (itemId: string, maxPrice: number) =>
+  request<AutoNegotiation>(`${item(itemId)}/auto-negotiate`, { method: 'POST', body: { max_price: maxPrice } })
+
+/** 出品者には全員ぶん、それ以外には自分が買い手の記録だけが返る */
+export const listNegotiations = (itemId: string) =>
+  request<{ negotiations: AutoNegotiation[] }>(`${item(itemId)}/negotiations`)
+
+// ---- 写真 ----
+
+export const uploadImage = (file: Blob, filename = 'photo.jpg') => {
+  const formData = new FormData()
+  formData.append('file', file, filename)
+  return request<UploadedImage>('/images', { method: 'POST', formData })
+}
+
+// ---- お知らせ ----
+
+export const getNotifications = (limit = 20) =>
+  request<NotificationsResponse>('/me/notifications', { query: { limit } })
+
+export const readAllNotifications = () =>
+  request<{ unread_count: number }>('/me/notifications/read-all', { method: 'POST' })
+
 // ---- マイページ ----
 export const listMyItems = () => request<{ items: ItemSummary[] }>('/me/items')
 export const listMyOrders = () => request<{ orders: Order[] }>('/me/orders')
@@ -76,3 +112,9 @@ export const aiNegotiate = (itemId: string, amount: number) =>
     method: 'POST',
     body: { item_id: itemId, amount },
   })
+
+export const aiDescribeImage = (imageId: string) =>
+  request<DescribeImageResponse>('/ai/describe-image', { method: 'POST', body: { image_id: imageId } })
+
+export const aiAttention = (input: AttentionInput) =>
+  request<AttentionResponse>('/ai/attention', { method: 'POST', body: input })

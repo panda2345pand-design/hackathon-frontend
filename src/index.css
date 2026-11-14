@@ -53,3 +53,52 @@ body {
     transform: none;
   }
 }
+
+/* AI 同士の交渉の吹き出し。出てくるときに少しだけ下から浮かせる */
+.nego-bubble {
+  animation: nego-bubble-in 260ms ease both;
+}
+
+@keyframes nego-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* 写真を選ぶ枠 */
+.image-drop {
+  border: 2px dashed var(--mantine-color-gray-4);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-white);
+  color: var(--mantine-color-gray-7);
+  cursor: pointer;
+  display: block;
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+  width: 100%;
+}
+
+.image-drop:hover,
+.image-drop[data-dragging='true'] {
+  background: var(--mantine-color-nego-0);
+  border-color: var(--mantine-color-nego-6);
+}
+
+.image-drop:focus-visible {
+  outline: 2px solid var(--mantine-color-nego-8);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nego-bubble {
+    animation: none;
+  }
+
+  .image-drop {
+    transition: none;
+  }
+}
