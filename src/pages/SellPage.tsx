@@ -20,6 +20,7 @@ import { AiSourceBadge } from '../components/AiSourceBadge'
 import { PriceEstimatePanel } from '../components/PriceEstimatePanel'
 import { notifyError, notifySuccess } from '../lib/errors'
 import { parseYen } from '../lib/format'
+import { categoryLabel, conditionLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { AiSource, PriceEstimate } from '../types'
 
@@ -155,9 +156,10 @@ export function SellPage() {
   }
 
   const predicted = estimate?.available ? estimate.predicted_price : null
-  const selectData = (placeholder: string, values: string[] | undefined) => [
+  // value は API に送る英語のまま、見える文字(label)だけ日本語にする
+  const selectData = (placeholder: string, values: string[] | undefined, toLabel: (value: string) => string) => [
     { value: '', label: placeholder, disabled: true },
-    ...(values ?? []).map((v) => ({ value: v, label: v })),
+    ...(values ?? []).map((v) => ({ value: v, label: toLabel(v) })),
   ]
 
   return (
@@ -217,7 +219,7 @@ export function SellPage() {
                 label="カテゴリ"
                 required
                 disabled={options.loading}
-                data={selectData(options.loading ? '読み込み中…' : '選んでください', options.data?.categories)}
+                data={selectData(options.loading ? '読み込み中…' : '選んでください', options.data?.categories, categoryLabel)}
                 style={{ minWidth: 200 }}
                 {...form.getInputProps('category')}
               />
@@ -225,7 +227,7 @@ export function SellPage() {
                 label="状態"
                 required
                 disabled={options.loading}
-                data={selectData(options.loading ? '読み込み中…' : '選んでください', options.data?.conditions)}
+                data={selectData(options.loading ? '読み込み中…' : '選んでください', options.data?.conditions, conditionLabel)}
                 style={{ minWidth: 200 }}
                 {...form.getInputProps('condition')}
               />

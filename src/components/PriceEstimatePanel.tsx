@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { errorMessage } from '../lib/errors'
 import { formatCount, formatPrice } from '../lib/format'
+import { basisValueLabel, localizeQuoted } from '../lib/labels'
 import type { PriceBasis, PriceEstimate } from '../types'
 
 interface PriceEstimatePanelProps {
@@ -29,7 +30,9 @@ function direction(effect: PriceBasis['effect']): Direction {
 
 function BasisRow({ basis }: { basis: PriceBasis }) {
   const dir = direction(basis.effect)
-  const effectText = typeof basis.effect === 'string' ? basis.effect : null
+  // 理由の文はサーバーが作る。中に出てくるカテゴリ・状態の英語名だけ、表示用の日本語にする
+  const effectText = typeof basis.effect === 'string' ? localizeQuoted(basis.effect) : null
+  const valueText = basisValueLabel(basis.feature, basis.value)
   return (
     <List.Item>
       <Group gap={8} wrap="wrap">
@@ -37,7 +40,7 @@ function BasisRow({ basis }: { basis: PriceBasis }) {
           <Text span fw={600}>
             {basis.feature}
           </Text>
-          {basis.value !== null && basis.value !== '' && `:${basis.value}`}
+          {valueText !== '' && `:${valueText}`}
         </Text>
         {dir === 'up' && (
           <Badge size="sm" variant="light">

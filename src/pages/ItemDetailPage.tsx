@@ -28,6 +28,7 @@ import { PriceEstimatePanel } from '../components/PriceEstimatePanel'
 import { PurchaseModal } from '../components/PurchaseModal'
 import { notifyError, notifySuccess } from '../lib/errors'
 import { formatDate, formatPrice } from '../lib/format'
+import { categoryLabel, conditionLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { Offer, Order } from '../types'
 
@@ -201,10 +202,10 @@ function ItemDetailView({ id }: { id: string }) {
               </Title>
               <Group gap={6} mt="xs">
                 <Badge variant="light" color="gray" radius="sm">
-                  {data.category}
+                  {categoryLabel(data.category)}
                 </Badge>
                 <Badge variant="light" color="gray" radius="sm">
-                  {data.condition}
+                  {conditionLabel(data.condition)}
                 </Badge>
                 {data.brand && (
                   <Badge variant="light" color="gray" radius="sm">

@@ -23,6 +23,7 @@ import { ItemGrid, ItemGridSkeleton } from '../components/ItemGrid'
 import { PAGE_SIZE } from '../config'
 import { notifyError } from '../lib/errors'
 import { formatCount } from '../lib/format'
+import { categoryLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { ItemStatus, ItemSummary } from '../types'
 
@@ -177,7 +178,8 @@ export function HomePage() {
             onChange={(e) => updateParam('category', e.currentTarget.value)}
             data={[
               { value: '', label: 'すべてのカテゴリ' },
-              ...(categories.data?.categories ?? []).map((c) => ({ value: c, label: c })),
+              // value は API に送る英語のまま、見える文字だけ日本語にする
+              ...(categories.data?.categories ?? []).map((c) => ({ value: c, label: categoryLabel(c) })),
             ]}
             disabled={categories.loading}
             style={{ flex: '1 1 180px', maxWidth: 280 }}

@@ -2,6 +2,7 @@ import { Badge, Box, Card, Group, Skeleton, Text } from '@mantine/core'
 import { IconHeart } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { formatPrice } from '../lib/format'
+import { conditionLabel } from '../lib/labels'
 import type { ItemSummary } from '../types'
 import { ItemImage } from './ItemImage'
 
@@ -36,7 +37,7 @@ export function ItemCard({ item }: { item: ItemSummary }) {
       </Text>
       <Group justify="space-between" gap="xs" mt={6} wrap="nowrap">
         <Badge variant="light" color="gray" radius="sm" style={{ minWidth: 0 }}>
-          {item.condition}
+          {conditionLabel(item.condition)}
         </Badge>
         <Group gap={3} wrap="nowrap" c="dimmed" aria-label={`いいね ${item.like_count} 件`}>
           <IconHeart size={14} aria-hidden />

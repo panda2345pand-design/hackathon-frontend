@@ -15,6 +15,7 @@ import {
   type Icon,
 } from '@tabler/icons-react'
 import { useState } from 'react'
+import { categoryLabel } from '../lib/labels'
 
 // 商品写真が無いとき(データセットに写真は無い)は、カテゴリごとに決まった色とアイコンの面を出す。
 // 同じカテゴリは必ず同じ見た目になる。外部の画像は使わない。
@@ -82,21 +83,23 @@ export function ItemImage({
     )
   }
 
+  // 色とアイコンは元の(英語の)カテゴリ名から決め、見える文字だけ日本語にする
   const { color, PlaceholderIcon } = placeholderFor(category)
+  const label = categoryLabel(category)
   return (
     <AspectRatio ratio={ratio}>
       <Box
         role="img"
-        aria-label={`${title}(写真なし・${category || 'カテゴリなし'})`}
+        aria-label={`${title}(写真なし・${label || 'カテゴリなし'})`}
         bg={`${color}.0`}
         c={`${color}.8`}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         <Stack align="center" gap={6} px="xs">
           <PlaceholderIcon size={iconSize} stroke={1.4} aria-hidden />
-          {showLabel && category && (
+          {showLabel && label && (
             <Text size="xs" fw={600} ta="center" lineClamp={1}>
-              {category}
+              {label}
             </Text>
           )}
         </Stack>
