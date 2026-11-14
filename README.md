@@ -77,7 +77,7 @@ src/
 │   └── NotFoundPage.tsx
 ├── components/         ItemCard, ItemImage(写真なしのときの面), PriceEstimatePanel,
 │                       NegotiateModal, PurchaseModal, OffersPanel, AiSourceBadge, AppLayout など
-├── lib/                format(金額・日付), errors(通知), useApi(読み込みフック)
+├── lib/                format(金額・日付), labels(カテゴリ・状態の日本語名), errors(通知), useApi(読み込みフック)
 └── test/               テストの共通準備
 ```
 
@@ -88,6 +88,9 @@ src/
 - **商品写真は外から借りない。** `image_url` が空のときは、カテゴリごとに決まった色とアイコンの面を出す
 - エラーは API の `detail.message` をそのまま通知に出す。読み込み中はスケルトン、0 件のときは次の行動つきの空状態を出す
 - スマホ幅(390px)を先に作り、PC 幅に広げる
+- **カテゴリと状態は表示だけ日本語にする。** 元データ(米国メルカリ)は英語なので、`src/lib/labels.ts` の対応表で `Women` →「レディース」、`Like new` →「未使用に近い」と見せる。API に送る値と URL の絞り込み条件は英語のまま。対応表に無い値はそのまま出す。AI ジャンルは API の `label_ja` があればそれを、無ければ `label` を出す。商品名・説明文・ブランドは出品データそのものなので訳さない
+- **ホーム以外のページは開いたときに読み込む**(`App.tsx` の `React.lazy`)。最初に読み込む JS は 672.55 kB → 461.04 kB(gzip 208.78 kB → 143.83 kB)
+- **トークンは使い回さない。** Firebase の ID トークンは 1 時間で切れるので、API を呼ぶたびに SDK の `getIdToken()` から取り直す(期限が近ければ SDK が自動で更新する)。`src/auth/firebaseToken.test.ts` で確かめている
 
 ## デプロイ(Vercel)
 
