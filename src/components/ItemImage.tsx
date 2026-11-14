@@ -75,7 +75,9 @@ export function ItemImage({
         <img
           src={imageUrl}
           alt={title}
+          // 画面に近づくまで読み込まず、画像の展開で画面の描画を止めない
           loading="lazy"
+          decoding="async"
           onError={() => setBroken(true)}
           style={{ objectFit: 'cover', display: 'block' }}
         />
