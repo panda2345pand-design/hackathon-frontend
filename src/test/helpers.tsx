@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '../auth/context'
 import { theme } from '../theme'
+import type { ItemDetail } from '../types'
 
 export function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -43,13 +44,39 @@ const signedIn: AuthContextValue = {
   signOut: async () => {},
 }
 
-/** Mantine・ルーター・ログイン済みの認証コンテキストで包んで描画する */
-export function renderPage(ui: ReactElement, route = '/') {
+/**
+ * Mantine・ルーター・認証コンテキストで包んで描画する。
+ * 既定はログイン済み(dev モード)。auth で一部だけ差しかえられる(未ログイン、firebase モードなど)。
+ */
+export function renderPage(ui: ReactElement, route = '/', auth: Partial<AuthContextValue> = {}) {
   return render(
     <MantineProvider theme={theme}>
       <MemoryRouter initialEntries={[route]}>
-        <AuthContext.Provider value={signedIn}>{ui}</AuthContext.Provider>
+        <AuthContext.Provider value={{ ...signedIn, ...auth }}>{ui}</AuthContext.Provider>
       </MemoryRouter>
     </MantineProvider>,
   )
+}
+
+/** テスト用の商品(詳細)。必要な項目だけ上書きして使う */
+export function makeItem(overrides: Partial<ItemDetail> = {}): ItemDetail {
+  return {
+    id: 'i1',
+    title: 'Nintendo Switch Case',
+    price: 3000,
+    category: 'Electronics',
+    condition: 'Like new',
+    image_url: null,
+    status: 'on_sale',
+    cluster_id: 11,
+    like_count: 0,
+    created_at: '2026-11-14T00:00:00Z',
+    description: 'ケースです',
+    brand: null,
+    predicted_price: 2800,
+    cluster_label: null,
+    seller: { id: 'bob', name: 'ボブ' },
+    liked: false,
+    ...overrides,
+  }
 }
