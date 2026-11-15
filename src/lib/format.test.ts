@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { slugifyName } from '../auth/devAuth'
-import { formatDate, formatPrice, parseYen } from './format'
+import { formatDate, formatPrice, formatRelativeTime, parseYen } from './format'
 
 describe('formatPrice', () => {
   it('円記号と 3 桁区切りを付ける', () => {
@@ -67,5 +67,26 @@ describe('slugifyName(dev ログインの uid)', () => {
 
   it('何も残らないときは user にする', () => {
     expect(slugifyName('   ')).toBe('user')
+  })
+})
+
+describe('formatRelativeTime', () => {
+  const now = new Date('2026-11-15T03:00:00Z')
+
+  it('今からどれくらい前かを、分・時間・日で出す', () => {
+    expect(formatRelativeTime('2026-11-15T02:59:40Z', now)).toBe('たった今')
+    expect(formatRelativeTime('2026-11-15T02:55:00Z', now)).toBe('5分前')
+    expect(formatRelativeTime('2026-11-15T00:00:00Z', now)).toBe('3時間前')
+    expect(formatRelativeTime('2026-11-13T03:00:00Z', now)).toBe('2日前')
+  })
+
+  it('タイムゾーンの印がない時刻は UTC として読む(9 時間ずれない)', () => {
+    expect(formatRelativeTime('2026-11-15T02:55:00', now)).toBe('5分前')
+  })
+
+  it('7 日より前は日付、時計のずれで未来になっても「たった今」、読めない値は空文字', () => {
+    expect(formatRelativeTime('2026-11-01T03:00:00Z', now)).toBe('2026/11/01')
+    expect(formatRelativeTime('2026-11-15T03:00:30Z', now)).toBe('たった今')
+    expect(formatRelativeTime('not a date', now)).toBe('')
   })
 })

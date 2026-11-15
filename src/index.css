@@ -102,3 +102,16 @@ body {
     transition: none;
   }
 }
+
+/* 画面には出さず、読み上げソフトにだけ伝える文字 */
+.visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

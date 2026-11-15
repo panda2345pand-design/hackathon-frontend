@@ -16,6 +16,7 @@ import { IconChevronDown, IconLogout, IconPlus, IconUser } from '@tabler/icons-r
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/context'
 import { notifyError } from '../lib/errors'
+import { NotificationBell } from './NotificationBell'
 
 const NAV = [
   { to: '/', label: 'さがす', end: true },
@@ -92,6 +93,7 @@ function UserMenu() {
 /** 全ページ共通の枠: ヘッダー(ロゴ・ナビ・ユーザーメニュー)と本文 */
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure(false)
+  const { user } = useAuth()
 
   return (
     <AppShell header={{ height: 56 }} padding={0}>
@@ -121,7 +123,11 @@ export function AppLayout() {
                 <NavLinks />
               </Group>
             </Group>
-            <UserMenu />
+            <Group gap="xs" wrap="nowrap">
+              {/* お知らせはログイン中だけ。key で、別の人がログインしたら前の人のお知らせを捨てる */}
+              {user && <NotificationBell key={user.id} />}
+              <UserMenu />
+            </Group>
           </Group>
         </Container>
       </AppShell.Header>
