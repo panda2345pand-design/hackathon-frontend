@@ -55,7 +55,7 @@ describe('NotificationBell', () => {
 
     await user.click(bell)
 
-    const menu = await screen.findByRole('menu')
+    const menu = await screen.findByRole('menu', { hidden: true })
     // hidden: true … テスト環境(jsdom)は位置の計算ができず、Mantine のメニューが display: none のままになるため
     const first = await within(menu).findByRole('menuitem', { name: /AI が ¥5,800 で合意しました/, hidden: true })
     expect(first).toHaveAttribute('href', '/items/i1')
