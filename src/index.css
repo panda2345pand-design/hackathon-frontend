@@ -115,3 +115,20 @@ body {
   white-space: nowrap;
   width: 1px;
 }
+
+/* ホームの案内の 1 行(行全体がリンク) */
+.onboarding-step {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-nego-2);
+  border-radius: var(--mantine-radius-md);
+  padding: 8px 10px;
+}
+
+.onboarding-step:hover {
+  border-color: var(--mantine-color-nego-6);
+}
+
+.onboarding-step:focus-visible {
+  outline: 2px solid var(--mantine-color-nego-8);
+  outline-offset: 2px;
+}

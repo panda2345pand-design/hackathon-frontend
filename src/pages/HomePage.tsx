@@ -20,6 +20,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { getCategories, getClusters, listItems } from '../api'
 import { EmptyState, ErrorState } from '../components/EmptyState'
 import { ItemGrid, ItemGridSkeleton } from '../components/ItemGrid'
+import { OnboardingCard } from '../components/OnboardingCard'
 import { PAGE_SIZE } from '../config'
 import { notifyError } from '../lib/errors'
 import { formatCount } from '../lib/format'
@@ -156,15 +157,20 @@ export function HomePage() {
   const hasFilter = Boolean(q || category || cluster !== undefined)
   const clusterList = clusters.data?.clusters ?? []
   const hasMore = list.items.length < list.total
+  // 案内の ① から直接行ける、AI 交渉ができる販売中の商品(無ければ null)
+  const negotiableItemId =
+    list.items.find((item) => item.auto_negotiation === true && item.status === 'on_sale')?.id ?? null
 
   return (
     <Stack gap="lg">
+      <OnboardingCard negotiableItemId={negotiableItemId} />
+
       <div>
         <Title order={1} size="h2">
           商品をさがす
         </Title>
         <Text size="sm" c="dimmed" mt={4}>
-          AI が出品者と購入者のあいだに立つフリマ。適正価格の目安と価格交渉の手伝いがつきます。
+          AI が出品者と購入者のあいだに立つフリマ。適正価格の目安がつき、価格交渉は AI 同士に任せることもできます。
         </Text>
       </div>
 
@@ -240,7 +246,7 @@ export function HomePage() {
         </div>
       </Stack>
 
-      <section aria-label="検索結果">
+      <section aria-label="検索結果" id="item-list">
         {loading ? (
           <ItemGridSkeleton />
         ) : list.error !== null ? (
