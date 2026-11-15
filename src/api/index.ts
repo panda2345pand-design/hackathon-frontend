@@ -1,6 +1,4 @@
 import type {
-  AttentionInput,
-  AttentionResponse,
   AutoNegotiation,
   CategoriesResponse,
   ClustersResponse,
@@ -115,6 +113,3 @@ export const aiNegotiate = (itemId: string, amount: number) =>
 
 export const aiDescribeImage = (imageId: string) =>
   request<DescribeImageResponse>('/ai/describe-image', { method: 'POST', body: { image_id: imageId } })
-
-export const aiAttention = (input: AttentionInput) =>
-  request<AttentionResponse>('/ai/attention', { method: 'POST', body: input })

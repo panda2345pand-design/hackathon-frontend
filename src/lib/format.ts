@@ -52,12 +52,6 @@ export function formatRelativeTime(iso: string | null | undefined, now: Date = n
   return tokyoDate.format(date)
 }
 
-/** 割合(0〜1)を「21%」の形にする */
-export function formatPercent(ratio: number | null | undefined): string {
-  if (ratio === null || ratio === undefined || !Number.isFinite(ratio)) return '—'
-  return `${Math.round(ratio * 100)}%`
-}
-
 /** 入力欄の値を正の整数(円)にする。正の整数でなければ null */
 export function parseYen(value: number | string): number | null {
   const n = typeof value === 'number' ? value : Number(value.replaceAll(',', '').trim() || NaN)

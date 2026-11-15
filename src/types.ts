@@ -198,24 +198,6 @@ export interface NotificationsResponse {
   notifications: AppNotification[]
 }
 
-// ---- いいねされやすさ ----
-
-export interface AttentionPricePoint {
-  price: number
-  probability: number
-}
-
-/** モデルが無いときは {available: false} だけが返るので、ほかの項目はすべて任意にしている */
-export interface AttentionResponse {
-  available: boolean
-  probability?: number
-  level?: Acceptance
-  base_rate?: number
-  price_effect?: AttentionPricePoint[]
-  reasons?: string[]
-  metrics?: { auc?: number | null; n_train?: number | null; n_test?: number | null } | null
-}
-
 export interface NegotiateResponse {
   acceptance: Acceptance
   reply: string
@@ -259,14 +241,6 @@ export interface PriceInput {
   category: string
   condition: string
   brand?: string
-}
-
-export interface AttentionInput {
-  title: string
-  category: string
-  condition: string
-  brand: string | null
-  price: number
 }
 
 export interface CreateOfferInput {
