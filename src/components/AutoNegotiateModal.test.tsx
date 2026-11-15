@@ -142,7 +142,7 @@ describe('AutoNegotiateModal', () => {
     expect(screen.getByText('合意')).toBeInTheDocument()
     expect(screen.getByText('¥5,800')).toBeInTheDocument()
     expect(screen.getByText('出品価格 ¥6,500 より ¥700 安い(11% 引き)')).toBeInTheDocument()
-    expect(screen.getByText('あなたの上限:¥6,000(出品者には見えていません)')).toBeInTheDocument()
+    expect(screen.getByText('あなたの上限:¥6,000(上限としては出品者に表示されません)')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'すべて表示' })).not.toBeInTheDocument()
 
     expect(calls.find((c) => c.key === 'POST /items/i1/auto-negotiate')?.body).toEqual({ max_price: 6000 })

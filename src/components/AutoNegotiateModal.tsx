@@ -193,7 +193,7 @@ export function AutoNegotiateModal({
               <Sides />
               <Text size="sm">
                 あなたの AI と出品者の AI が、最大 4 往復で金額を話し合います。
-                あなたの上限も、出品者の最低価格も、相手には見えません。
+                あなたの上限も出品者の最低価格も、限度額としては相手に表示されません。AI が出した提示額は、おたがいに見えます。
               </Text>
 
               <div>
@@ -270,7 +270,7 @@ export function AutoNegotiateModal({
           <Stack gap="md">
             {typeof result.max_price === 'number' && (
               <Text size="xs" c="dimmed" className="price">
-                あなたの上限:{formatPrice(result.max_price)}(出品者には見えていません)
+                あなたの上限:{formatPrice(result.max_price)}(上限としては出品者に表示されません)
               </Text>
             )}
 

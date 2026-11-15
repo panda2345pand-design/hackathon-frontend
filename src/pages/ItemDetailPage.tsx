@@ -305,7 +305,7 @@ function ItemDetailView({ id }: { id: string }) {
                       AI に交渉を任せる
                     </Button>
                     <Text size="xs" c="dimmed" mt={4}>
-                      あなたの AI と出品者の AI が、最大 4 往復で金額を決めます。上限は出品者に見えません。
+                      あなたの AI と出品者の AI が、最大 4 往復で金額を決めます。上限そのものは出品者に表示されません。
                     </Text>
                   </div>
                 )}
