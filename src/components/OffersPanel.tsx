@@ -71,7 +71,7 @@ export function OffersPanel({ item, onChanged }: OffersPanelProps) {
             <Paper key={offer.id} withBorder p="md">
               <Group justify="space-between" align="flex-start" gap="sm">
                 <div>
-                  <Text className="price" fw={700} size="xl" lh={1.2}>
+                  <Text className="price" fw={600} size="xl" lh={1.2}>
                     {formatPrice(offer.amount)}
                   </Text>
                   <Text size="xs" c="dimmed">
@@ -93,7 +93,7 @@ export function OffersPanel({ item, onChanged }: OffersPanelProps) {
                 <Group gap={6} mt="sm" wrap="nowrap" align="flex-start" c="nego.9">
                   <IconSparkles size={16} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden />
                   <Text size="sm">
-                    <Text span fw={700}>
+                    <Text span fw={600}>
                       AI のコメント:
                     </Text>
                     {offer.ai_comment}

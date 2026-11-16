@@ -10,7 +10,7 @@ export function NotFoundPage() {
       title="ページが見つかりません"
       description="URL が変わったか、ページが無くなった可能性があります。"
       action={
-        <Button component={Link} to="/" variant="light">
+        <Button component={Link} to="/" variant="default">
           商品をさがす
         </Button>
       }

@@ -16,8 +16,8 @@ function NotificationRow({ notification }: { notification: AppNotification }) {
       <Box
         w={8}
         h={8}
-        mt={6}
-        bg={notification.read ? 'transparent' : 'nego.6'}
+        mt={8}
+        bg={notification.read ? 'transparent' : 'nego.8'}
         style={{ borderRadius: '50%', flexShrink: 0 }}
         aria-hidden
       />
@@ -101,7 +101,8 @@ export function NotificationBell() {
           <ActionIcon
             variant="subtle"
             color="gray"
-            size="lg"
+            // 押せる範囲を 44px にする
+            size={44}
             radius="xl"
             aria-label={unread > 0 ? `お知らせ(未読 ${unread} 件)` : 'お知らせ'}
           >
@@ -111,7 +112,7 @@ export function NotificationBell() {
         <Menu.Dropdown maw="calc(100vw - 24px)" mah={420} style={{ overflowY: 'auto' }}>
           <Menu.Label>お知らせ</Menu.Label>
           {list.length === 0 && (
-            <Text size="sm" c="dimmed" px="sm" py="md" ta="center">
+            <Text size="sm" c="dimmed" px="sm" py="lg" ta="center">
               {failed && !data ? 'お知らせを読み込めませんでした' : data ? 'お知らせはまだありません' : '読み込んでいます…'}
             </Text>
           )}

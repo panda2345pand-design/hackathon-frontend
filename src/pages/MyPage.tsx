@@ -89,7 +89,7 @@ function MyOrders() {
                       購入日:{formatDate(order.created_at)}
                     </Text>
                   </div>
-                  <Text className="price" fw={700} size="lg" style={{ flexShrink: 0 }}>
+                  <Text className="price" fw={600} size="lg" style={{ flexShrink: 0 }}>
                     {formatPrice(order.price)}
                   </Text>
                 </Group>
@@ -134,7 +134,7 @@ function MyOffers() {
                       </Text>
                     </div>
                     <Stack gap={4} align="flex-end" style={{ flexShrink: 0 }}>
-                      <Text className="price" fw={700} size="lg" lh={1.2}>
+                      <Text className="price" fw={600} size="lg" lh={1.2}>
                         {formatPrice(offer.amount)}
                       </Text>
                       <Badge color={status.color} variant="light">

@@ -184,15 +184,19 @@ export function LoginPage() {
                     <Button
                       key={account.key}
                       variant="light"
+                      // 2 行の背の高いボタンなので、ピルではなくカードと同じ角丸にする
+                      radius="md"
                       h="auto"
-                      py="xs"
+                      py="sm"
+                      // スマホの幅でも文字が切れないように、左右の余白を小さくする
+                      px="xs"
                       loading={demoBusy === account.key}
                       disabled={submitting || (demoBusy !== null && demoBusy !== account.key)}
                       onClick={() => signInDemo(account)}
                       aria-label={`${account.label}(${account.hint})`}
                     >
                       <Stack gap={2} align="center">
-                        <Text size="sm" fw={700}>
+                        <Text size="sm" fw={600}>
                           {account.label}
                         </Text>
                         <Text size="xs" style={{ whiteSpace: 'normal' }}>

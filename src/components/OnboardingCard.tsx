@@ -1,4 +1,4 @@
-import { CloseButton, Group, Paper, SimpleGrid, Text, ThemeIcon, UnstyledButton } from '@mantine/core'
+import { CloseButton, Group, Paper, SimpleGrid, Text, UnstyledButton } from '@mantine/core'
 import { IconChevronRight } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, type To } from 'react-router-dom'
@@ -61,20 +61,16 @@ export function OnboardingCard({ negotiableItemId }: OnboardingCardProps) {
   ]
 
   return (
-    <Paper
-      withBorder
-      p="sm"
-      bg="nego.0"
-      component="section"
-      aria-labelledby="onboarding-heading"
-      style={{ borderColor: 'var(--mantine-color-nego-2)' }}
-    >
-      <Group justify="space-between" wrap="nowrap" gap="xs" mb={6}>
-        <Text fw={700} size="sm" component="h2" m={0} id="onboarding-heading">
+    // lit: ランディングで製品の画面の後ろに敷いている「空色の面」。その上に白いカードを 3 枚置く
+    <Paper p={{ base: 'sm', sm: 'md' }} className="lit" component="section" aria-labelledby="onboarding-heading">
+      <Group justify="space-between" wrap="nowrap" gap="xs" mb="xs">
+        <Text fw={600} component="h2" m={0} id="onboarding-heading">
           はじめての方へ:3つの AI を試す
         </Text>
         <CloseButton
-          size="sm"
+          size="lg"
+          radius="xl"
+          c="inherit"
           aria-label="案内を閉じる"
           onClick={() => {
             rememberDismissed()
@@ -82,7 +78,7 @@ export function OnboardingCard({ negotiableItemId }: OnboardingCardProps) {
           }}
         />
       </Group>
-      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs" verticalSpacing={6}>
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm" verticalSpacing="xs">
         {steps.map((step, index) => (
           <UnstyledButton
             key={step.title}
@@ -90,24 +86,22 @@ export function OnboardingCard({ negotiableItemId }: OnboardingCardProps) {
             to={step.to}
             state={step.state}
             onClick={step.onClick}
-            className="onboarding-step"
+            className="onboarding-step lit-card"
             aria-label={`${index + 1}. ${step.title}:${step.note}`}
           >
-            <Group gap="xs" wrap="nowrap">
-              <ThemeIcon size={24} radius="xl" aria-hidden>
-                <Text size="xs" fw={700}>
-                  {index + 1}
-                </Text>
-              </ThemeIcon>
+            <Group gap="sm" wrap="nowrap">
+              <span className="step-num" aria-hidden>
+                {index + 1}
+              </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <Text size="sm" fw={700} lh={1.3}>
+                <Text size="sm" fw={600} lh={1.4}>
                   {step.title}
                 </Text>
-                <Text size="xs" c="dimmed" lh={1.3} truncate>
+                <Text size="xs" c="dimmed" lh={1.4} truncate>
                   {step.note}
                 </Text>
               </div>
-              <IconChevronRight size={16} color="var(--mantine-color-nego-8)" aria-hidden />
+              <IconChevronRight size={16} color="var(--nego-accent)" aria-hidden />
             </Group>
           </UnstyledButton>
         ))}

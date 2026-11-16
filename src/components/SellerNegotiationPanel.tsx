@@ -64,7 +64,7 @@ function MinPriceEditor({ item, onItemChanged }: SellerNegotiationPanelProps) {
             <Text size="xs" c="dimmed">
               AI 交渉の最低価格
             </Text>
-            <Text className="price" fw={700} size="xl" lh={1.2}>
+            <Text className="price" fw={600} size="xl" lh={1.2}>
               {current !== null ? formatPrice(current) : '未設定'}
             </Text>
           </div>
@@ -176,7 +176,7 @@ export function SellerNegotiationPanel({ item, onItemChanged }: SellerNegotiatio
             <Paper key={record.id} withBorder p="md">
               <Group justify="space-between" align="flex-start" gap="sm">
                 <div>
-                  <Text className="price" fw={700} size="xl" lh={1.2}>
+                  <Text className="price" fw={600} size="xl" lh={1.2}>
                     {agreed ? formatPrice(record.agreed_price) : '—'}
                   </Text>
                   <Text size="xs" c="dimmed">

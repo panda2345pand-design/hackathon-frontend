@@ -21,7 +21,8 @@ import { categoryLabel } from '../lib/labels'
 // 商品写真が無いとき、または写真を読み込めなかったときは、カテゴリごとに決まった色とアイコンの面を出す。
 // 同じカテゴリは必ず同じ見た目になる。
 
-const COLORS = ['nego', 'indigo', 'orange', 'grape', 'cyan', 'pink', 'lime', 'blue'] as const
+/** 色あいの数。色そのものは index.css の .photo-blank[data-tone] にある(紫は使わない決まり) */
+const TONES = 8
 
 const ICONS: ReadonlyArray<readonly [RegExp, Icon]> = [
   [/家電|スマホ|電子|パソコン|カメラ|electronic|phone|computer|camera/i, IconDeviceMobile],
@@ -45,10 +46,10 @@ function hash(text: string): number {
   return h
 }
 
-function placeholderFor(category: string): { color: string; PlaceholderIcon: Icon } {
-  const color = COLORS[hash(category) % COLORS.length]
+function placeholderFor(category: string): { tone: number; PlaceholderIcon: Icon } {
+  const tone = (hash(category) % TONES) + 1
   const match = ICONS.find(([pattern]) => pattern.test(category))
-  return { color, PlaceholderIcon: match ? match[1] : IconPackage }
+  return { tone, PlaceholderIcon: match ? match[1] : IconPackage }
 }
 
 interface ItemImageProps {
@@ -89,21 +90,20 @@ export function ItemImage({
   }
 
   // 色とアイコンは元の(英語の)カテゴリ名から決め、見える文字だけ日本語にする
-  const { color, PlaceholderIcon } = placeholderFor(category)
+  const { tone, PlaceholderIcon } = placeholderFor(category)
   const label = categoryLabel(category)
   return (
     <AspectRatio ratio={ratio}>
       <Box
         role="img"
         aria-label={`${title}(写真なし・${label || 'カテゴリなし'})`}
-        bg={`${color}.0`}
-        c={`${color}.8`}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        className="photo-blank"
+        data-tone={tone}
       >
         <Stack align="center" gap={6} px="xs">
           <PlaceholderIcon size={iconSize} stroke={1.4} aria-hidden />
           {showLabel && label && (
-            <Text size="xs" fw={600} ta="center" lineClamp={1}>
+            <Text size="xs" fw={500} ta="center" lineClamp={1}>
               {label}
             </Text>
           )}

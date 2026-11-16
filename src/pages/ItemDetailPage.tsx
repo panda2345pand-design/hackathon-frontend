@@ -34,13 +34,13 @@ import { categoryLabel, clusterLabel, conditionLabel } from '../lib/labels'
 import { useApi } from '../lib/useApi'
 import type { Offer, Order } from '../types'
 
-const SIMILAR_CARD_WIDTH = 168
+const SIMILAR_CARD_WIDTH = 184
 
 function DetailSkeleton() {
   return (
     <Grid gap="lg" role="status" aria-label="商品を読み込んでいます">
       <Grid.Col span={{ base: 12, sm: 5 }}>
-        <Skeleton style={{ aspectRatio: '1 / 1' }} />
+        <Skeleton style={{ aspectRatio: '1 / 1' }} radius="lg" />
       </Grid.Col>
       <Grid.Col span={{ base: 12, sm: 7 }}>
         <Skeleton height={28} width="80%" />
@@ -146,7 +146,7 @@ function ItemDetailView({ id }: { id: string }) {
           title="商品が見つかりません"
           description="削除されたか、URL が間違っている可能性があります。"
           action={
-            <Button component={Link} to="/" variant="light">
+            <Button component={Link} to="/" variant="default">
               商品をさがす
             </Button>
           }
@@ -214,16 +214,15 @@ function ItemDetailView({ id }: { id: string }) {
 
       <Grid gap={{ base: 'md', sm: 'xl' }}>
         <Grid.Col span={{ base: 12, sm: 5 }}>
-          <Paper withBorder style={{ overflow: 'hidden' }} pos="relative">
-            <Box style={sold ? { opacity: 0.55 } : undefined}>
-              <ItemImage title={data.title} category={data.category} imageUrl={data.image_url} iconSize={72} />
-            </Box>
+          {/* photo-frame: 写真の枠(一覧のカードと同じ部品の大きい版)。売り切れのときは写真だけうすくする */}
+          <div className="photo-frame photo-frame--lg" data-sold={sold || undefined}>
+            <ItemImage title={data.title} category={data.category} imageUrl={data.image_url} iconSize={72} />
             {sold && (
-              <Badge color="dark" size="lg" radius="sm" pos="absolute" top={12} left={12}>
+              <Badge color="dark" size="lg" pos="absolute" top={12} left={12}>
                 売り切れ
               </Badge>
             )}
-          </Paper>
+          </div>
           {data.image_ai_generated === true && data.image_url && (
             // 見本データの画像は AI が作ったもの。実物の写真と思われないように、写真のすぐ下に書く
             <Group gap={6} mt="xs" wrap="nowrap" align="flex-start" c="dimmed">
@@ -234,20 +233,20 @@ function ItemDetailView({ id }: { id: string }) {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, sm: 7 }}>
-          <Stack gap="md">
+          <Stack gap="lg">
             <div>
-              <Title order={1} size="h3" style={{ overflowWrap: 'anywhere' }}>
+              <Title order={1} size="h2" style={{ overflowWrap: 'anywhere' }}>
                 {data.title}
               </Title>
-              <Group gap={6} mt="xs">
-                <Badge variant="light" color="gray" radius="sm">
+              <Group gap={6} mt="sm">
+                <Badge variant="light" color="gray">
                   {categoryLabel(data.category)}
                 </Badge>
-                <Badge variant="light" color="gray" radius="sm">
+                <Badge variant="light" color="gray">
                   {conditionLabel(data.condition)}
                 </Badge>
                 {data.brand && (
-                  <Badge variant="light" color="gray" radius="sm">
+                  <Badge variant="light" color="gray">
                     {data.brand}
                   </Badge>
                 )}
@@ -255,7 +254,7 @@ function ItemDetailView({ id }: { id: string }) {
             </div>
 
             <Group justify="space-between" align="center">
-              <Text className="price" fw={700} fz={32} lh={1.1}>
+              <Text className="price" fw={500} fz={36} lh={1.1}>
                 {formatPrice(data.price)}
               </Text>
               <Button
@@ -288,7 +287,7 @@ function ItemDetailView({ id }: { id: string }) {
                 届いた価格交渉は、このページの下で承諾・見送りができます。
               </Alert>
             ) : (
-              <Stack gap="xs">
+              <Stack gap="sm">
                 {agreedOffer && (
                   <Alert variant="light" title={`${formatPrice(agreedOffer.amount)} で交渉が成立しています`}>
                     出品価格 {formatPrice(data.price)} ではなく、成立した金額で購入できます。
@@ -297,30 +296,30 @@ function ItemDetailView({ id }: { id: string }) {
                 {showAutoNegotiate && (
                   <div>
                     <Button
-                      size="md"
+                      size="lg"
                       fullWidth
                       leftSection={<IconSparkles size={18} aria-hidden />}
                       onClick={() => requireLogin() && auto.open()}
                     >
                       AI に交渉を任せる
                     </Button>
-                    <Text size="xs" c="dimmed" mt={4}>
+                    <Text size="xs" c="dimmed" mt={8}>
                       あなたの AI と出品者の AI が、最大 4 往復で金額を決めます。上限そのものは出品者に表示されません。
                     </Text>
                   </div>
                 )}
                 <Group grow gap="sm">
-                  {/* 画面でいちばん目立つボタンは 1 つにする。AI 交渉を出しているあいだは、購入を枠線だけにする */}
+                  {/* 画面でいちばん目立つボタンは 1 つにする。AI 交渉を出しているあいだは、購入を灰色の面のボタンにする */}
                   <Button
                     size="md"
-                    variant={showAutoNegotiate ? 'outline' : 'filled'}
+                    variant={showAutoNegotiate ? 'default' : 'filled'}
                     onClick={() => requireLogin() && purchase.open()}
                   >
                     {agreedOffer ? 'この金額で購入する' : '購入する'}
                   </Button>
                   <Button
                     size="md"
-                    variant="light"
+                    variant="default"
                     leftSection={<IconMessageDollar size={18} aria-hidden />}
                     onClick={() => requireLogin() && negotiate.open()}
                   >
@@ -342,8 +341,8 @@ function ItemDetailView({ id }: { id: string }) {
         <Title order={2} size="h4" id="description-heading" mb="sm">
           商品の説明
         </Title>
-        <Paper withBorder p="md">
-          <Text style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+        <Paper withBorder p={{ base: 'md', sm: 'lg' }}>
+          <Text style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} maw={720}>
             {data.description || '説明はありません。'}
           </Text>
           <Text size="sm" c="dimmed" mt="md">

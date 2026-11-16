@@ -51,6 +51,7 @@ function SearchForm({ initial, onSearch }: { initial: string; onSearch: (q: stri
     <form onSubmit={submit} role="search">
       <Group gap="xs" align="flex-end" wrap="nowrap">
         <TextInput
+          radius="xl"
           style={{ flex: 1 }}
           aria-label="キーワードで検索"
           placeholder="キーワードで検索"
@@ -74,7 +75,10 @@ function SearchForm({ initial, onSearch }: { initial: string; onSearch: (q: stri
           onChange={(e) => setText(e.currentTarget.value)}
           enterKeyHint="search"
         />
-        <Button type="submit">検索</Button>
+        {/* 緑の塗りのボタンは 1 画面に 1 つ(ヘッダーの主のボタン)にしたいので、検索は灰色の面のボタンにする */}
+        <Button type="submit" variant="default">
+          検索
+        </Button>
       </Group>
     </form>
   )
@@ -162,19 +166,19 @@ export function HomePage() {
     list.items.find((item) => item.auto_negotiation === true && item.status === 'on_sale')?.id ?? null
 
   return (
-    <Stack gap="lg">
+    <Stack gap="xl">
       <OnboardingCard negotiableItemId={negotiableItemId} />
 
       <div>
         <Title order={1} size="h2">
           商品をさがす
         </Title>
-        <Text size="sm" c="dimmed" mt={4}>
+        <Text c="dimmed" mt={6} maw={640}>
           AI が出品者と購入者のあいだに立つフリマ。適正価格の目安がつき、価格交渉は AI 同士に任せることもできます。
         </Text>
       </div>
 
-      <Stack gap="sm">
+      <Stack gap="md">
         <SearchForm key={q} initial={q} onSearch={(value) => updateParam('q', value)} />
 
         <Group gap="sm" align="flex-end">
@@ -202,9 +206,9 @@ export function HomePage() {
         </Group>
 
         <div>
-          <Group gap={6} mb={6}>
-            <IconSparkles size={16} color="var(--mantine-color-nego-8)" aria-hidden />
-            <Text size="sm" fw={700} id="cluster-label">
+          <Group gap={6} mb="xs">
+            <IconSparkles size={16} color="var(--nego-accent)" aria-hidden />
+            <Text size="sm" fw={600} id="cluster-label">
               AI ジャンル
             </Text>
             <Text size="xs" c="dimmed">
@@ -214,7 +218,7 @@ export function HomePage() {
           {clusters.loading && (
             <Group gap="xs" wrap="nowrap" role="status" aria-label="AI ジャンルを読み込んでいます">
               {[96, 120, 88, 110].map((w) => (
-                <Skeleton key={w} height={28} width={w} radius="xl" />
+                <Skeleton key={w} height={32} width={w} radius="xl" />
               ))}
             </Group>
           )}
@@ -262,7 +266,7 @@ export function HomePage() {
             }
             action={
               hasFilter ? (
-                <Button variant="light" onClick={() => setParams({}, { replace: true })}>
+                <Button variant="default" onClick={() => setParams({}, { replace: true })}>
                   条件をすべて外す
                 </Button>
               ) : (
@@ -274,7 +278,7 @@ export function HomePage() {
           />
         ) : (
           <Stack gap="md">
-            <Text size="sm" c="dimmed" aria-live="polite">
+            <Text size="sm" c="dimmed" aria-live="polite" className="price">
               {formatCount(list.total)} 件中 {formatCount(list.items.length)} 件を表示
             </Text>
             <ItemGrid items={list.items} />

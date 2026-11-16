@@ -15,11 +15,11 @@ interface EmptyStateProps {
 export function EmptyState({ title, description, icon: IconComponent = IconInbox, action }: EmptyStateProps) {
   return (
     <Paper withBorder p="xl">
-      <Stack align="center" gap="sm" py="md">
-        <ThemeIcon variant="light" color="gray" size={52} radius="xl">
-          <IconComponent size={26} stroke={1.5} aria-hidden />
+      <Stack align="center" gap="sm" py="lg">
+        <ThemeIcon variant="light" color="gray" size={48}>
+          <IconComponent size={24} stroke={1.5} aria-hidden />
         </ThemeIcon>
-        <Text fw={700} ta="center">
+        <Text fw={600} size="lg" ta="center">
           {title}
         </Text>
         {description && (
@@ -43,7 +43,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
         description={errorMessage(error)}
         action={
           onRetry && (
-            <Button variant="light" onClick={onRetry}>
+            <Button variant="default" onClick={onRetry}>
               もう一度読み込む
             </Button>
           )
