@@ -1,0 +1,97 @@
+[
+  {
+    "file": "fastapi.svg",
+    "icon": "logos:fastapi-icon",
+    "name": "FastAPI",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://fastapi.tiangolo.com/"
+  },
+  {
+    "file": "firebase.svg",
+    "icon": "logos:firebase-icon",
+    "name": "Firebase",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://www.firebase.com/"
+  },
+  {
+    "file": "gemini.svg",
+    "icon": "logos:google-gemini-icon",
+    "name": "Gemini",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://deepmind.google/technologies/gemini/"
+  },
+  {
+    "file": "google-cloud-run.svg",
+    "icon": "logos:google-cloud-run",
+    "name": "Google Cloud Run",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://cloud.google.com/run/"
+  },
+  {
+    "file": "mysql.svg",
+    "icon": "logos:mysql-icon",
+    "name": "MySQL",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://dev.mysql.com/"
+  },
+  {
+    "file": "react.svg",
+    "icon": "logos:react",
+    "name": "React",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://facebook.github.io/react/"
+  },
+  {
+    "file": "ui-smartphone.svg",
+    "icon": "ui:smartphone",
+    "name": "Smartphone",
+    "kind": "line",
+    "source": "@iconify-json/lucide@1.2.100",
+    "author": "Lucide Contributors",
+    "licence": "ISC",
+    "url": "https://github.com/lucide-icons/lucide",
+    "trademark": false
+  },
+  {
+    "file": "vercel.svg",
+    "icon": "logos:vercel-icon",
+    "name": "Vercel",
+    "kind": "colour",
+    "source": "gilbarbara/logos@d6960edc1b7309d392c76e40d3a320df7f9ff85c",
+    "author": "Gil Barbara",
+    "licence": "CC0-1.0",
+    "url": "https://github.com/gilbarbara/logos",
+    "trademark": true,
+    "markUrl": "https://vercel.com/"
+  }
+]

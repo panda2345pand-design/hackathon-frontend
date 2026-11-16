@@ -28,3 +28,7 @@ dist-ssr
 !.env.production
 !.env.example
 .vercel
+
+# welcome page (tasteskill): checker state and screenshots must not ship
+public/welcome/.taste-skill/
+public/welcome/shots/
