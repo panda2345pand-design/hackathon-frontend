@@ -1,4 +1,4 @@
-import { Box, Divider, Paper, Stack, Text } from '@mantine/core'
+import { Stack } from '@mantine/core'
 import { formatPrice } from '../lib/format'
 import type { NegotiationRound } from '../types'
 
@@ -29,51 +29,38 @@ function toBubbles(rounds: NegotiationRound[]) {
 /**
  * AI 同士のやりとりをチャットの形で見せる。金額はサーバーが決めた値、せりふは Gemini(または定型文)。
  * role="log" にして、あとから増えた吹き出しを読み上げソフトが順に読めるようにしている。
+ *
+ * 見た目はランディングページの交渉の画面と同じ(色と形は index.css の .ng-* にまとめてある):
+ * - 自分の AI = 右側の灰色の吹き出し、金額は緑
+ * - 相手の AI = 左側。吹き出しの面は付けず、インク色の丸いマークを先頭に置く
+ * - 「1 往復目」の区切り = 線を引かず、中央に小さな文字だけ
  */
 export function NegotiationTranscript({ rounds, viewer, visibleCount }: NegotiationTranscriptProps) {
   const bubbles = toBubbles(rounds).slice(0, visibleCount ?? Number.POSITIVE_INFINITY)
 
   return (
-    <Stack gap="xs" role="log" aria-label="AI 同士のやりとり" aria-live="polite">
+    <Stack gap="sm" role="log" aria-label="AI 同士のやりとり" aria-live="polite">
       {bubbles.map((bubble) => {
         const mine = bubble.side === viewer
         const who = NAMES[viewer][bubble.side]
+        const body = (
+          <div style={{ minWidth: 0 }}>
+            <span className="ng-who">{who}</span>
+            <span className="ng-amt price">{formatPrice(bubble.amount)}</span>
+            {bubble.message && <span className="ng-text">{bubble.message}</span>}
+          </div>
+        )
         return (
-          <Stack key={bubble.key} gap="xs">
-            {bubble.side === 'buyer' && (
-              <Divider label={`${bubble.round} 往復目`} labelPosition="center" className="nego-bubble" />
-            )}
-            <Box
-              className="nego-bubble"
+          <Stack key={bubble.key} gap="sm">
+            {bubble.side === 'buyer' && <div className="ng-day nego-bubble">{bubble.round} 往復目</div>}
+            <div
+              className={`nego-bubble ${mine ? 'ng-msg--me' : 'ng-msg--other'}`}
               role="group"
               aria-label={`${bubble.round} 往復目・${who}:${formatPrice(bubble.amount)}`}
-              maw="86%"
-              style={{ alignSelf: mine ? 'flex-end' : 'flex-start' }}
             >
-              <Text size="xs" c="dimmed" ta={mine ? 'right' : 'left'} mb={2}>
-                {who}
-              </Text>
-              <Paper
-                px="sm"
-                py="xs"
-                radius="lg"
-                bg={mine ? 'nego.0' : 'gray.1'}
-                style={{
-                  border: `1px solid var(--mantine-color-${mine ? 'nego-2' : 'gray-3'})`,
-                  // しっぽの代わりに、話している側の角だけ小さくする
-                  ...(mine ? { borderBottomRightRadius: 4 } : { borderBottomLeftRadius: 4 }),
-                }}
-              >
-                <Text className="price" fw={700} fz={20} lh={1.2} c={mine ? 'nego.9' : undefined}>
-                  {formatPrice(bubble.amount)}
-                </Text>
-                {bubble.message && (
-                  <Text size="sm" mt={2} style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                    {bubble.message}
-                  </Text>
-                )}
-              </Paper>
-            </Box>
+              {!mine && <span className="ng-agent" aria-hidden />}
+              {body}
+            </div>
           </Stack>
         )
       })}

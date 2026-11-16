@@ -1,5 +1,5 @@
-import { Accordion, Anchor, Badge, Group, List, Paper, Skeleton, Stack, Text, ThemeIcon } from '@mantine/core'
-import { IconPlugConnectedX, IconSparkles } from '@tabler/icons-react'
+import { Accordion, Anchor, Badge, Group, List, Skeleton, Stack, Text } from '@mantine/core'
+import { IconPlugConnectedX } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { errorMessage } from '../lib/errors'
@@ -35,9 +35,10 @@ function BasisRow({ basis }: { basis: PriceBasis }) {
   const valueText = basisValueLabel(basis.feature, basis.value)
   return (
     <List.Item>
-      <Group gap={8} wrap="wrap">
+      {/* 1 行目に項目、2 行目に小さく理由(ランディングの同じ画面と同じ並べ方) */}
+      <Group gap={8} wrap="wrap" align="center">
         <Text size="sm">
-          <Text span fw={600}>
+          <Text span fw={500}>
             {basis.feature}
           </Text>
           {valueText !== '' && `:${valueText}`}
@@ -52,29 +53,28 @@ function BasisRow({ basis }: { basis: PriceBasis }) {
             ↓ 価格を下げる要因
           </Badge>
         )}
-        {dir === null && effectText && (
-          <Text size="xs" c="dimmed">
-            {effectText}
-          </Text>
-        )}
       </Group>
+      {dir === null && effectText && (
+        <Text size="xs" c="dimmed" lh={1.5}>
+          {effectText}
+        </Text>
+      )}
     </List.Item>
   )
 }
 
 function Frame({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Paper withBorder p="md" bg="nego.0" style={{ borderColor: 'var(--mantine-color-nego-2)' }}>
+    // ai-panel: AI が出した内容を入れる緑のうすい面。先頭の丸いマークは、AI を表すインク色の印(index.css)
+    <div className="ai-panel">
       <Group gap={8} mb="sm" wrap="nowrap">
-        <ThemeIcon size="sm" radius="xl" aria-hidden>
-          <IconSparkles size={14} />
-        </ThemeIcon>
-        <Text fw={700} size="sm" component="h3" m={0}>
+        <span className="ng-agent" style={{ marginTop: 0, width: 20, height: 20 }} aria-hidden />
+        <Text fw={600} size="sm" component="h3" m={0}>
           {title}
         </Text>
       </Group>
       {children}
-    </Paper>
+    </div>
   )
 }
 
@@ -133,7 +133,7 @@ export function PriceEstimatePanel({
       <Stack gap="sm">
         <Group justify="space-between" align="flex-end" gap="sm">
           <div>
-            <Text className="price" fw={700} fz={28} lh={1.1} c="nego.9">
+            <Text className="price" fw={500} fz={30} lh={1.15} c="nego.9">
               {formatPrice(estimate.predicted_price)}
             </Text>
             {estimate.low !== null && estimate.high !== null && (
@@ -147,10 +147,10 @@ export function PriceEstimatePanel({
 
         {basis.length > 0 && (
           <div>
-            <Text size="xs" fw={700} c="dimmed" mb={4}>
+            <Text size="xs" fw={500} c="dimmed" mb={4}>
               この目安になった理由
             </Text>
-            <List spacing={4} size="sm">
+            <List spacing={8} size="sm" listStyleType="none">
               {basis.map((b, i) => (
                 <BasisRow key={`${b.feature}-${i}`} basis={b} />
               ))}
@@ -162,7 +162,7 @@ export function PriceEstimatePanel({
           <Accordion variant="default" chevronPosition="left" styles={{ content: { paddingTop: 0 } }}>
             <Accordion.Item value="accuracy" style={{ borderBottom: 0 }}>
               <Accordion.Control px={0}>
-                <Text size="sm" fw={600}>
+                <Text size="sm" fw={500}>
                   このAIの精度
                 </Text>
               </Accordion.Control>

@@ -1,6 +1,6 @@
-import { Alert, Badge, Box, Button, Group, Modal, NumberInput, Paper, Skeleton, Stack, Text, ThemeIcon } from '@mantine/core'
-import { IconArrowsExchange, IconBuildingStore, IconSparkles, IconUser } from '@tabler/icons-react'
-import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react'
+import { Alert, Badge, Button, Group, Modal, NumberInput, Skeleton, Stack, Text } from '@mantine/core'
+import { IconArrowsExchange, IconSparkles } from '@tabler/icons-react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { ApiError, autoNegotiate } from '../api'
 import { errorMessage } from '../lib/errors'
 import { formatPrice, parseYen } from '../lib/format'
@@ -62,29 +62,27 @@ function toFailure(error: unknown): Failure {
 
 /** 「あなたの AI ⇄ 出品者の AI」の小さな図(何が起きるかをひと目で伝える) */
 function Sides() {
-  const side = (icon: ReactNode, label: string, note: string) => (
-    <Stack gap={4} align="center" style={{ flex: 1, minWidth: 0 }}>
-      <ThemeIcon variant="light" size={40} radius="xl" aria-hidden>
-        {icon}
-      </ThemeIcon>
-      <Text size="sm" fw={700} ta="center">
-        {label}
-      </Text>
-      <Text size="xs" c="dimmed" ta="center">
-        {note}
-      </Text>
-    </Stack>
+  // 2 つの AI を、同じ形の白いカードで並べる。先頭の丸いマークは、やりとりの画面で AI に付くマークと同じ
+  const side = (label: string, note: string) => (
+    <Group gap="xs" wrap="nowrap" className="lit-card" p="sm" style={{ flex: 1, minWidth: 0 }}>
+      <span className="ng-agent" style={{ marginTop: 0 }} aria-hidden />
+      <div style={{ minWidth: 0 }}>
+        <Text size="sm" fw={600} lh={1.4}>
+          {label}
+        </Text>
+        <Text size="xs" c="dimmed" lh={1.4}>
+          {note}
+        </Text>
+      </div>
+    </Group>
   )
   return (
-    <Paper withBorder p="sm" bg="nego.0" style={{ borderColor: 'var(--mantine-color-nego-2)' }}>
-      <Group gap="xs" wrap="nowrap" align="flex-start">
-        {side(<IconUser size={20} />, 'あなたの AI', '上限を知っている')}
-        <Box c="nego.8" pt={8}>
-          <IconArrowsExchange size={22} aria-hidden />
-        </Box>
-        {side(<IconBuildingStore size={20} />, '出品者の AI', '最低価格を知っている')}
-      </Group>
-    </Paper>
+    // lit: ランディングで製品の画面の後ろに敷いている「空色の面」
+    <Group gap="xs" wrap="nowrap" align="center" className="lit" p="sm">
+      {side('あなたの AI', '上限を知っている')}
+      <IconArrowsExchange size={20} style={{ flexShrink: 0 }} aria-hidden />
+      {side('出品者の AI', '最低価格を知っている')}
+    </Group>
   )
 }
 
@@ -191,7 +189,7 @@ export function AutoNegotiateModal({
           <form onSubmit={start} noValidate>
             <Stack gap="md">
               <Sides />
-              <Text size="sm">
+              <Text size="sm" lh={1.7}>
                 あなたの AI と出品者の AI が、最大 4 往復で金額を話し合います。
                 あなたの上限も出品者の最低価格も、限度額としては相手に表示されません。AI が出した提示額は、おたがいに見えます。
               </Text>
@@ -256,13 +254,13 @@ export function AutoNegotiateModal({
 
         {running && (
           // 結果が返るまで、吹き出しと同じ形の枠を出しておく(届いたときに画面が大きく動かないように)
-          <Stack gap="xs" role="status" aria-label="2 つの AI が交渉しています">
+          <Stack gap="sm" role="status" aria-label="2 つの AI が交渉しています">
             <Text size="sm" c="dimmed" ta="center">
               2 つの AI が交渉しています…
             </Text>
-            <Skeleton height={64} width="70%" radius="lg" style={{ alignSelf: 'flex-end' }} />
-            <Skeleton height={64} width="70%" radius="lg" />
-            <Skeleton height={64} width="70%" radius="lg" style={{ alignSelf: 'flex-end' }} />
+            <Skeleton height={64} width="70%" radius="md" style={{ alignSelf: 'flex-end' }} />
+            <Skeleton height={64} width="70%" radius="md" />
+            <Skeleton height={64} width="70%" radius="md" style={{ alignSelf: 'flex-end' }} />
           </Stack>
         )}
 
@@ -285,17 +283,13 @@ export function AutoNegotiateModal({
             )}
 
             {!playing && agreed !== null && (
-              <Paper
-                withBorder
-                p="md"
-                bg="nego.0"
-                className="nego-bubble"
-                role="status"
-                style={{ borderColor: 'var(--mantine-color-nego-4)' }}
-              >
+              // ng-deal: 合意のカード(緑のうすい面 + 緑の細い枠)。ランディングの「合意」と同じ描き方
+              <div className="ng-deal nego-bubble" role="status">
                 <Group gap="sm" align="center">
-                  <Badge size="lg">合意</Badge>
-                  <Text className="price" fw={700} fz={32} lh={1.1} c="nego.9">
+                  <Badge size="lg" variant="light">
+                    合意
+                  </Badge>
+                  <Text className="price ng-deal__amt" component="span">
                     {formatPrice(agreed)}
                   </Text>
                 </Group>
@@ -307,38 +301,38 @@ export function AutoNegotiateModal({
                 <Text size="xs" c="dimmed" mt={6}>
                   購入はまだ確定していません。あとで買うときは、マイページの「出した価格交渉」からもすすめます。
                 </Text>
-              </Paper>
+              </div>
             )}
 
             {!playing && result.outcome === 'no_deal' && (
-              <Paper withBorder p="md" bg="gray.0" className="nego-bubble" role="status">
+              <div className="ng-nodeal nego-bubble" role="status">
                 <Group gap="sm" align="center">
-                  <Badge size="lg" color="gray">
+                  <Badge size="lg" color="gray" variant="light">
                     不成立
                   </Badge>
-                  <Text fw={700}>今回は金額が合いませんでした</Text>
+                  <Text fw={600}>今回は金額が合いませんでした</Text>
                 </Group>
                 <Text size="sm" mt={6}>
                   {result.rounds.length} 往復しても、2 つの AI の金額が届きませんでした。上限を上げると合意できることがあります。
                 </Text>
-              </Paper>
+              </div>
             )}
 
             {/* どう決めたかと、せりふの出どころは、演出の途中でもいつも見せる(このアプリの方針: 正直に出す) */}
-            <Paper withBorder p="sm">
-              <Group gap="xs" mb={4}>
-                <Text size="xs" fw={700} c="dimmed">
-                  合意の決め方(数字の規則)
-                </Text>
-              </Group>
-              <Text size="sm">{result.rule}</Text>
+            <div className="ng-rule">
+              <Text size="xs" fw={500} c="dimmed" mb={4}>
+                合意の決め方(数字の規則)
+              </Text>
+              <Text size="sm" lh={1.7}>
+                {result.rule}
+              </Text>
               <Group gap="xs" mt="xs" align="center">
                 <Text size="xs" c="dimmed">
                   せりふ:
                 </Text>
                 <AiSourceBadge source={result.source} />
               </Group>
-            </Paper>
+            </div>
 
             {!playing && (
               <Group justify="flex-end">

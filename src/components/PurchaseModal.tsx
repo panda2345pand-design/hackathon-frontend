@@ -52,7 +52,7 @@ function PurchaseBody({ item, onClose, onPurchased }: Omit<PurchaseModalProps, '
         {myOffers.loading ? (
           <Skeleton height={32} width={140} mt={4} />
         ) : (
-          <Text className="price" fw={700} fz={28} lh={1.2}>
+          <Text className="price" fw={500} fz={30} lh={1.2}>
             {formatPrice(price)}
           </Text>
         )}

@@ -5,7 +5,6 @@ import {
   Group,
   Modal,
   NumberInput,
-  Paper,
   Stack,
   Text,
   Textarea,
@@ -137,13 +136,14 @@ export function NegotiateModal({ item, opened, onClose, onSent }: NegotiateModal
 
         {advice && acceptance && (
           <Stack gap="md">
-            <Paper withBorder p="sm" bg="nego.0" style={{ borderColor: 'var(--mantine-color-nego-2)' }}>
+            {/* ai-panel: AI が出した内容を入れる緑のうすい面(適正価格の目安と同じ) */}
+            <div className="ai-panel">
               <Group justify="space-between" gap="xs">
                 <div>
                   <Text size="xs" c="dimmed">
                     希望額
                   </Text>
-                  <Text className="price" fw={700} size="xl">
+                  <Text className="price" fw={600} size="xl">
                     {formatPrice(advice.amount)}
                   </Text>
                 </div>
@@ -159,7 +159,7 @@ export function NegotiateModal({ item, opened, onClose, onSent }: NegotiateModal
                   AI の適正価格の目安:{formatPrice(advice.result.predicted_price)}
                 </Text>
               )}
-            </Paper>
+            </div>
 
             <Textarea
               label="出品者に送るメッセージ"
