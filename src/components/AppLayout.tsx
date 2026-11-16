@@ -1,16 +1,4 @@
-import {
-  AppShell,
-  Avatar,
-  Burger,
-  Button,
-  Container,
-  Drawer,
-  Group,
-  Menu,
-  Stack,
-  Text,
-  UnstyledButton,
-} from '@mantine/core'
+import { AppShell, Avatar, Burger, Button, Drawer, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconLogout, IconPlus, IconUser } from '@tabler/icons-react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
@@ -24,6 +12,15 @@ const NAV = [
   { to: '/me', label: 'マイページ', end: false },
   { to: '/about-ai', label: 'AI のしくみ', end: false },
 ] as const
+
+/** Nego のマーク(アーチの形)。ランディングページのロゴと同じ図形なので、同じ製品だと分かる */
+function NegoMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path fill="currentColor" d="M2.5 21.5V12a9.5 9.5 0 0 1 19 0v9.5h-6V12a3.5 3.5 0 0 0-7 0v9.5z" />
+    </svg>
+  )
+}
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -44,8 +41,9 @@ function UserMenu() {
   if (status === 'loading') return null
 
   if (!user) {
+    // ヘッダーの主のボタン(ランディングのヘッダーと同じ、緑の塗りのピル)
     return (
-      <Button component={Link} to="/login" variant="light" size="sm">
+      <Button component={Link} to="/login">
         ログイン
       </Button>
     )
@@ -63,10 +61,10 @@ function UserMenu() {
   return (
     <Menu position="bottom-end" width={200} withinPortal>
       <Menu.Target>
-        <UnstyledButton aria-label={`ユーザーメニュー(${user.name})`} py={4}>
+        <UnstyledButton aria-label={`ユーザーメニュー(${user.name})`} className="user-button">
           <Group gap={6} wrap="nowrap">
             <Avatar color="nego" radius="xl" size="sm" name={user.name} />
-            <Text size="sm" fw={600} maw={120} truncate visibleFrom="xs">
+            <Text size="sm" fw={500} maw={120} truncate visibleFrom="xs">
               {user.name}
             </Text>
             <IconChevronDown size={14} aria-hidden />
@@ -90,58 +88,64 @@ function UserMenu() {
   )
 }
 
-/** 全ページ共通の枠: ヘッダー(ロゴ・ナビ・ユーザーメニュー)と本文 */
+/** 全ページ共通の枠: ヘッダー(ロゴ・ナビ・ユーザーメニュー)、本文、フッター */
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure(false)
   const { user } = useAuth()
 
   return (
-    <AppShell header={{ height: 56 }} padding={0}>
+    // ヘッダーの高さはランディングと同じ(パソコン 72px、スマホ 56px)
+    <AppShell header={{ height: { base: 56, sm: 72 } }} padding={0}>
       <AppShell.Header>
-        <Container size="lg" h="100%">
-          <Group h="100%" justify="space-between" wrap="nowrap">
-            <Group gap="xs" wrap="nowrap">
-              <Burger
-                opened={opened}
-                onClick={toggle}
-                hiddenFrom="sm"
-                size="sm"
-                aria-label={opened ? 'メニューを閉じる' : 'メニューを開く'}
-              />
-              <Text
-                component={Link}
-                to="/"
-                fw={800}
-                fz={22}
-                c="nego.8"
-                style={{ textDecoration: 'none', letterSpacing: '-0.02em' }}
-                aria-label="Nego ホーム"
-              >
-                Nego
-              </Text>
-              <Group component="nav" gap={4} ml="md" visibleFrom="sm" aria-label="メインメニュー">
-                <NavLinks />
-              </Group>
-            </Group>
-            <Group gap="xs" wrap="nowrap">
-              {/* お知らせはログイン中だけ。key で、別の人がログインしたら前の人のお知らせを捨てる */}
-              {user && <NotificationBell key={user.id} />}
-              <UserMenu />
-            </Group>
+        {/* nego-wrap: ランディングと同じ幅と左右の余白。ロゴが左の線、右端のボタンが右の線にそろう */}
+        <div className="nego-wrap nego-bar">
+          <Link to="/" className="brand" aria-label="Nego ホーム">
+            <NegoMark />
+            Nego
+          </Link>
+          <Group component="nav" gap={4} visibleFrom="sm" aria-label="メインメニュー" wrap="nowrap">
+            <NavLinks />
           </Group>
-        </Container>
+          <div className="nego-bar__end">
+            {/* お知らせはログイン中だけ。key で、別の人がログインしたら前の人のお知らせを捨てる */}
+            {user && <NotificationBell key={user.id} />}
+            <UserMenu />
+            <Burger
+              opened={opened}
+              onClick={toggle}
+              hiddenFrom="sm"
+              size="sm"
+              // 押せる範囲を 44px にする
+              w={44}
+              h={44}
+              aria-label={opened ? 'メニューを閉じる' : 'メニューを開く'}
+            />
+          </div>
+        </div>
       </AppShell.Header>
 
-      <Drawer opened={opened} onClose={close} title="メニュー" size="75%" hiddenFrom="sm">
-        <Stack component="nav" gap={4} aria-label="メインメニュー">
+      <Drawer opened={opened} onClose={close} title="メニュー" size="100%" position="right" hiddenFrom="sm">
+        <Stack component="nav" gap={0} aria-label="メインメニュー" className="nav-sheet">
           <NavLinks onNavigate={close} />
         </Stack>
       </Drawer>
 
-      <AppShell.Main>
-        <Container size="lg" py={{ base: 'md', sm: 'xl' }}>
+      {/* 本文が短いページでも、フッターが画面の下に来るように縦に並べる */}
+      <AppShell.Main display="flex" style={{ flexDirection: 'column' }}>
+        <div className="nego-wrap" style={{ flex: 1, paddingBlock: 'clamp(20px, 4vw, 40px)' }}>
           <Outlet />
-        </Container>
+        </div>
+        <footer className="nego-footer">
+          <div className="nego-wrap nego-footer__row">
+            <Text size="sm" c="dimmed">
+              Nego — AI があいだに立つフリマ
+            </Text>
+            {/* ランディングページは React の外にある静的な HTML なので、Link ではなくふつうの <a> で開く */}
+            <a className="quiet-link" href="/welcome/">
+              Nego とは
+            </a>
+          </div>
+        </footer>
       </AppShell.Main>
     </AppShell>
   )
