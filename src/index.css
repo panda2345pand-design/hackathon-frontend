@@ -1,62 +1,673 @@
-body {
-  background: var(--mantine-color-gray-0);
+/* ─────────────────────────────────────────────────────────────────────────────
+   Nego の見た目(theme.ts で決められない部分)。
+   値はランディングページ(public/welcome/assets/system.css など)と同じにして、
+   ランディングとアプリが 1 つの製品に見えるようにしている。
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* 色: 地 / インク(文字)/ 控えめな文字 / 緑 / 緑の文字 */
+  --nego-bg: #fafaf8;
+  --nego-ink: #1f2421;
+  --nego-muted: #646764;
+  --nego-accent: #02765d;
+  --nego-accent-text: #0b5c4a;
+  /* 細い線: インクを 11%(ふつう)/ 20%(強め)だけ混ぜた色 */
+  --nego-line: rgb(31 36 33 / 0.11);
+  --nego-line-strong: rgb(31 36 33 / 0.2);
+  /* 2 番目のボタンの面: インクを 8%(ふつう)/ 14%(マウスを乗せたとき)混ぜた色 */
+  --nego-tonal: #e8e9e7;
+  --nego-tonal-hover: #dbdddb;
+  /* 緑のうすい面(AI のパネル・合意のカード) */
+  --nego-tint: #e9f5f1;
+  --nego-tint-line: rgb(2 118 93 / 0.3);
+  /* 自分の AI の吹き出しの面(インク 7%) */
+  --nego-fill: #efefed;
+
+  /* 左右の余白と本文の幅(ランディングの .wrap と同じ: 幅 1280px まで、余白 80 / 48 / 24px) */
+  --nego-gut: 80px;
+  --nego-wrap: 1280px;
+
+  /* 動きの長さ(ランディングの motion.css と同じ) */
+  --m-in: 150ms;
+  --m-out: 120ms;
+  --m-press: 90ms;
+  --m-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* 数字の桁がそろうように、金額は等幅の数字で出す */
+@media (max-width: 1023px) {
+  :root {
+    --nego-gut: 48px;
+  }
+}
+
+@media (max-width: 639px) {
+  :root {
+    --nego-gut: 24px;
+  }
+}
+
+body {
+  background: var(--nego-bg);
+  color: var(--nego-ink);
+  /* 日本語の行の折り返しをきれいにする(行頭に「、」や「。」が来ないようにする) */
+  line-break: strict;
+}
+
+/* ヘッダー・本文・フッターで同じ幅と左右の余白を使う */
+.nego-wrap {
+  margin-inline: auto;
+  width: min(100% - 2 * var(--nego-gut), var(--nego-wrap));
+}
+
+/* 金額: 桁がそろうように等幅の数字で出す */
 .price {
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
 }
 
-.item-card {
-  transition:
-    box-shadow 120ms ease,
-    transform 120ms ease;
+/* 見出しは字間を少し詰める(ランディングと同じ) */
+.mantine-Title-root {
+  letter-spacing: -0.02em;
 }
 
-.item-card:hover,
-.item-card:focus-visible {
-  box-shadow: var(--mantine-shadow-md);
-  transform: translateY(-2px);
+/* ── ヘッダー ─────────────────────────────────────────────────────────────── */
+
+/* 地の色のままで、下に細い線を 1 本だけ(影・ぼかしは付けない) */
+.mantine-AppShell-header {
+  background: var(--nego-bg);
+  border-bottom-color: var(--nego-line);
 }
 
-.item-card:focus-visible {
-  outline: 2px solid var(--mantine-color-nego-8);
-  outline-offset: 2px;
+/* 左: ロゴ / 中央: ナビ / 右: お知らせとユーザー */
+.nego-bar {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr auto 1fr;
+  height: 100%;
 }
 
-.nav-link {
-  border-radius: var(--mantine-radius-md);
-  color: var(--mantine-color-gray-7);
-  font-size: var(--mantine-font-size-sm);
-  font-weight: 600;
-  padding: 6px 12px;
+.nego-bar__end {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 47.99em) {
+  .nego-bar {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+/* ロゴ: 緑のマーク + 「Nego」の文字 */
+.brand {
+  align-items: center;
+  color: var(--nego-ink);
+  display: inline-flex;
+  font-size: 22px;
+  font-weight: 500;
+  gap: 8px;
+  justify-self: start;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  /* 押せる範囲を 44px にする */
+  min-height: 44px;
   text-decoration: none;
 }
 
-.nav-link:hover {
+.brand svg {
+  color: var(--nego-accent);
+  flex: none;
+  height: 22px;
+  width: 22px;
+}
+
+/* ナビの文字: 面は付けず、マウスを乗せると下線が左から引かれる。今いるページは下線を出したまま */
+.nav-link {
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--nego-ink);
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 500;
+  height: 44px;
+  padding: 0 12px;
+  position: relative;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link::after {
+  background: currentColor;
+  border-radius: 2px;
+  bottom: 8px;
+  content: '';
+  height: 2px;
+  left: 12px;
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--m-out) var(--m-ease);
+}
+
+.nav-link:focus-visible::after,
+.nav-link[aria-current='page']::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+    transition-duration: var(--m-in);
+  }
+}
+
+/* スマホのメニュー(引き出し)の中: 1 行 56px、行のあいだに細い線 */
+.nav-sheet .nav-link {
+  border-bottom: 1px solid var(--nego-line);
+  border-radius: 0;
+  font-size: 20px;
+  height: 56px;
+  padding: 0;
+}
+
+.nav-sheet .nav-link::after {
+  bottom: 12px;
+  left: 0;
+  right: auto;
+  width: 24px;
+}
+
+/* ユーザーメニューを開くボタン */
+.user-button {
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 4px 8px 4px 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .user-button:hover {
+    background: var(--nego-tonal);
+  }
+}
+
+/* ── フッター ─────────────────────────────────────────────────────────────── */
+
+.nego-footer {
+  border-top: 1px solid var(--nego-line);
+  color: var(--nego-muted);
+  font-size: var(--mantine-font-size-sm);
+  margin-top: 64px;
+}
+
+.nego-footer__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+  min-height: 72px;
+  padding-block: 12px;
+}
+
+/* 文中・フッターのリンク: うすい下線。マウスを乗せると濃くなる */
+.quiet-link {
+  align-items: center;
+  color: var(--nego-ink);
+  display: inline-flex;
+  min-height: 44px;
+  text-decoration: underline;
+  text-decoration-color: var(--nego-line-strong);
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--m-out) var(--m-ease);
+}
+
+.quiet-link:hover,
+.quiet-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.mantine-Anchor-root {
+  text-decoration-color: var(--nego-line-strong);
+  text-underline-offset: 3px;
+}
+
+/* ── ボタンの動き ─────────────────────────────────────────────────────────── */
+
+/* マウスを乗せると 1px 上がり、押すと 1px 下がって少し縮む(ランディングと同じ数字)。傾けたり光らせたりはしない */
+.mantine-Button-root {
+  font-weight: 500;
+  transition:
+    background-color var(--m-out) var(--m-ease),
+    border-color var(--m-out) var(--m-ease),
+    transform var(--m-out) var(--m-ease);
+}
+
+/* ボタンの高さ: ふつう 44px、小 36px、極小 32px */
+.mantine-Button-root {
+  --button-height-md: 44px;
+  --button-height-sm: 36px;
+  --button-height-xs: 32px;
+  --button-padding-x-md: 24px;
+  --button-padding-x-sm: 16px;
+  --button-padding-x-xs: 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mantine-Button-root:hover:not([data-disabled], [data-loading]) {
+    transform: translateY(-1px);
+    transition-duration: var(--m-in);
+  }
+}
+
+.mantine-Button-root:active:not([data-disabled], [data-loading]) {
+  transform: translateY(1px) scale(0.985);
+  transition-duration: var(--m-press);
+}
+
+/* スマホの幅では左右の余白を少し詰めて、モーダルの 2 つのボタンが 1 行に並ぶようにする */
+@media (max-width: 639px) {
+  .mantine-Button-root {
+    --button-padding-x-md: 18px;
+  }
+}
+
+/* 指で押す端末では、小さいボタンも 44px の高さにする(押しまちがいを防ぐ) */
+@media (pointer: coarse) {
+  .mantine-Button-root:not([data-size^='compact']) {
+    min-height: 44px;
+  }
+
+  .mantine-ActionIcon-root {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .mantine-Chip-label {
+    min-height: 40px;
+  }
+}
+
+/* ── 入力欄 ───────────────────────────────────────────────────────────────── */
+
+.mantine-Input-wrapper {
+  --input-height-md: 44px;
+}
+
+.mantine-Input-input {
+  transition:
+    border-color var(--m-out) var(--m-ease),
+    box-shadow var(--m-out) var(--m-ease);
+}
+
+.mantine-Input-input:hover:not(:focus, [data-error], :disabled) {
+  border-color: rgb(31 36 33 / 0.48);
+}
+
+/* 入力中: 緑の枠 + やわらかい輪 */
+.mantine-Input-input:focus:not([data-error]) {
+  border-color: var(--nego-accent);
+  box-shadow: 0 0 0 3px rgb(2 118 93 / 0.16);
+}
+
+/* ── ラベル(札)・チップ・タブ ─────────────────────────────────────────── */
+
+.mantine-Badge-root {
+  --badge-height-xs: 20px;
+  --badge-height-sm: 22px;
+  --badge-height-md: 24px;
+  --badge-height-lg: 28px;
+  --badge-fz-xs: 12px;
+  --badge-fz-sm: 12px;
+  --badge-fz-md: 13px;
+  --badge-fz-lg: 14px;
+}
+
+/* うすい色の札には、同じ色の細い枠を付ける(ランディングの画面の札と同じ) */
+.mantine-Badge-root[data-variant='light'] {
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 18%, transparent);
+}
+
+.mantine-Chip-label {
+  align-items: center;
+  font-weight: 500;
+}
+
+.mantine-Chip-label[data-checked] {
+  background: var(--nego-tint);
+  border-color: var(--nego-accent);
+  color: var(--nego-accent-text);
+}
+
+/* タブ: 選んでいるタブはインク色のピル、文字は地の色 */
+.mantine-Tabs-list {
+  gap: 4px;
+}
+
+.mantine-Tabs-tab {
+  color: var(--nego-ink);
+  font-weight: 500;
+  min-height: 44px;
+  padding-inline: 16px;
+}
+
+.mantine-Tabs-tab[data-active],
+.mantine-Tabs-tab[data-active]:hover {
+  background: var(--nego-ink);
+  color: var(--nego-bg);
+}
+
+/* スマホの幅では 3 つのタブが 1 行に入るように、文字と余白を少し小さくする(入らなければ横に動かせる) */
+@media (max-width: 639px) {
+  .mantine-Tabs-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .mantine-Tabs-tab {
+    flex: none;
+    font-size: var(--mantine-font-size-xs);
+    padding-inline: 12px;
+  }
+}
+
+.mantine-SegmentedControl-root {
+  background: var(--nego-tonal);
+}
+
+.mantine-SegmentedControl-label {
+  font-weight: 500;
+}
+
+/* メニュー(ユーザーメニュー・お知らせ) */
+.mantine-Menu-dropdown {
+  border-color: var(--nego-line);
+  padding: 6px;
+}
+
+.mantine-Menu-item {
+  border-radius: var(--mantine-radius-sm);
+  min-height: 44px;
+}
+
+.mantine-Menu-label {
+  color: var(--nego-muted);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+}
+
+/* ── カード ───────────────────────────────────────────────────────────────── */
+
+.mantine-Paper-root[data-with-border],
+.mantine-Card-root[data-with-border] {
+  border-color: var(--nego-line);
+}
+
+/* 商品カード: リンクなので、マウスを乗せると 2px 浮き、枠が少し濃くなり、やわらかい影が出る */
+.item-card {
+  transition:
+    border-color var(--m-out) var(--m-ease),
+    box-shadow var(--m-out) var(--m-ease),
+    transform var(--m-out) var(--m-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item-card:hover {
+    border-color: rgb(31 36 33 / 0.16);
+    box-shadow: var(--mantine-shadow-md);
+    transform: translateY(-2px);
+    transition-duration: 180ms;
+  }
+
+  /* 写真は枠の中で 1.03 倍になる(枠の大きさは変わらない) */
+  .item-card:hover .photo-frame img {
+    transform: scale(1.03);
+    transition-duration: 600ms;
+  }
+}
+
+.item-card:focus-visible {
+  outline: 2px solid var(--nego-accent);
+  outline-offset: 2px;
+}
+
+/* 写真の枠: カードの内側に 6px あけて置き、角丸はカード(16px)から 6px 引いた 10px にする */
+.photo-frame {
   background: var(--mantine-color-gray-1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
 }
 
-.nav-link[aria-current='page'] {
-  background: var(--mantine-color-nego-0);
-  color: var(--mantine-color-nego-9);
+.photo-frame img {
+  transition: transform 400ms var(--m-ease);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .item-card {
-    transition: none;
+.photo-frame[data-sold] > :first-child {
+  opacity: 0.55;
+}
+
+/* 商品ページの大きい写真の枠 */
+.photo-frame--lg {
+  border: 1px solid var(--nego-line);
+  border-radius: var(--mantine-radius-lg);
+}
+
+/* 写真が無いときの面。カテゴリごとに色あい(hue)だけ変える。紫は使わない */
+.photo-blank {
+  --h: 150;
+  align-items: center;
+  background: color-mix(in oklab, oklch(0.74 0.08 var(--h)) 30%, #fff);
+  color: color-mix(in oklab, oklch(0.5 0.09 var(--h)) 70%, var(--nego-ink));
+  display: flex;
+  justify-content: center;
+}
+
+.photo-blank[data-tone='1'] {
+  --h: 40;
+}
+.photo-blank[data-tone='2'] {
+  --h: 85;
+}
+.photo-blank[data-tone='3'] {
+  --h: 150;
+}
+.photo-blank[data-tone='4'] {
+  --h: 220;
+}
+.photo-blank[data-tone='5'] {
+  --h: 20;
+}
+.photo-blank[data-tone='6'] {
+  --h: 190;
+}
+.photo-blank[data-tone='7'] {
+  --h: 120;
+}
+.photo-blank[data-tone='8'] {
+  --h: 250;
+}
+
+/* ── 面 ───────────────────────────────────────────────────────────────────── */
+
+/* AI が出した内容を入れる、緑のうすい面(適正価格の目安など) */
+.ai-panel {
+  background: var(--nego-tint);
+  border: 1px solid rgb(2 118 93 / 0.18);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+}
+
+/* 「光の当たった空色の面」。ランディングで製品の画面の後ろに敷いている面と同じ色(#c6d3df / #d6e0e9)。
+   上に白いカードを置いて使う */
+.lit {
+  background:
+    radial-gradient(110% 120% at 0% 100%, #9fb9d4 0%, transparent 58%),
+    radial-gradient(90% 110% at 100% 0%, #e4ecf3 0%, transparent 62%),
+    radial-gradient(60% 90% at 62% 40%, #b3c7da 0%, transparent 70%),
+    #c6d3df;
+  border-radius: var(--mantine-radius-lg);
+  color: #25303a;
+}
+
+/* 空色の面の上の白いカード */
+.lit-card {
+  background: #fff;
+  border-radius: var(--mantine-radius-sm);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.1),
+    0 12px 24px -14px rgb(0 0 0 / 0.3);
+  color: var(--nego-ink);
+}
+
+/* ホームの案内の 1 行(行全体がリンク)。リンクなので 2px 浮く */
+.onboarding-step {
+  display: block;
+  min-height: 56px;
+  padding: 10px 12px;
+  transition: transform var(--m-out) var(--m-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .onboarding-step:hover {
+    transform: translateY(-2px);
+    transition-duration: 180ms;
   }
-
-  .item-card:hover,
-  .item-card:focus-visible {
-    transform: none;
-  }
 }
 
-/* AI 同士の交渉の吹き出し。出てくるときに少しだけ下から浮かせる */
+.onboarding-step:focus-visible {
+  outline: 2px solid var(--nego-accent);
+  outline-offset: 2px;
+}
+
+/* 番号の丸(インク色。緑は 1 つの面に 1 回だけ、の決まりにそろえる) */
+.step-num {
+  align-items: center;
+  background: var(--nego-ink);
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  flex: none;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+/* ── AI 同士の交渉(このアプリの目玉。ランディングの交渉の画面と同じ描き方) ──── */
+
+/* 「1 往復目」の区切り: 線は引かず、中央に控えめな文字だけ */
+.ng-day {
+  color: var(--nego-muted);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 16px;
+  text-align: center;
+}
+
+.ng-who {
+  color: var(--nego-muted);
+  display: block;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 18px;
+}
+
+.ng-amt {
+  font-size: 17px;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.ng-text {
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* 自分の AI: 右側の吹き出し。しっぽの代わりに右下の角だけ小さくする。金額は緑 */
+.ng-msg--me {
+  align-self: flex-end;
+  background: var(--nego-fill);
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: inset 0 0 0 1px var(--nego-line);
+  max-width: 86%;
+  padding: 8px 14px 10px;
+}
+
+.ng-msg--me .ng-amt {
+  color: var(--nego-accent-text);
+}
+
+/* 相手の AI: 左側。吹き出しの面は付けず、インク色の丸いマークを先頭に置く */
+.ng-msg--other {
+  align-items: flex-start;
+  align-self: flex-start;
+  display: flex;
+  gap: 10px;
+  max-width: 92%;
+}
+
+/* AI のマーク: インク色の丸に 4 つの角の光 */
+.ng-agent {
+  background: var(--nego-ink);
+  border-radius: 50%;
+  flex: none;
+  height: 24px;
+  margin-top: 2px;
+  position: relative;
+  width: 24px;
+}
+
+.ng-agent::after {
+  background: #fff;
+  content: '';
+  inset: 26%;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8c.5 4.3 2.9 6.7 7.2 7.2-4.3.5-6.7 2.9-7.2 7.2C7.5 10.9 5.1 8.5.8 8 5.1 7.5 7.5 5.1 8 .8z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8c.5 4.3 2.9 6.7 7.2 7.2-4.3.5-6.7 2.9-7.2 7.2C7.5 10.9 5.1 8.5.8 8 5.1 7.5 7.5 5.1 8 .8z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  position: absolute;
+}
+
+/* 合意のカード: 緑のうすい面 + 緑の細い枠。金額は大きく緑で */
+.ng-deal {
+  background: var(--nego-tint);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: inset 0 0 0 1px var(--nego-tint-line);
+  padding: 14px 16px;
+}
+
+.ng-deal__amt {
+  color: var(--nego-accent-text);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 34px;
+}
+
+/* 不成立のカード: 色を付けない灰色の面 */
+.ng-nodeal {
+  background: var(--mantine-color-gray-0);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: inset 0 0 0 1px var(--nego-line);
+  padding: 14px 16px;
+}
+
+/* 「合意の決め方」の箱: 面は付けず、細い枠だけ */
+.ng-rule {
+  border-radius: var(--mantine-radius-md);
+  box-shadow: inset 0 0 0 1px rgb(31 36 33 / 0.15);
+  padding: 12px 16px;
+}
+
+/* 吹き出しが出てくるとき、少しだけ下から浮かせる(ボタンを押した結果なので、スクロールの演出ではない) */
 .nego-bubble {
-  animation: nego-bubble-in 260ms ease both;
+  animation: nego-bubble-in 260ms var(--m-ease) both;
 }
 
 @keyframes nego-bubble-in {
@@ -66,42 +677,35 @@ body {
   }
 }
 
-/* 写真を選ぶ枠 */
+/* ── 写真を選ぶ枠 ─────────────────────────────────────────────────────────── */
+
 .image-drop {
-  border: 2px dashed var(--mantine-color-gray-4);
-  border-radius: var(--mantine-radius-md);
   background: var(--mantine-color-white);
+  border: 1.5px dashed var(--mantine-color-gray-4);
+  border-radius: var(--mantine-radius-md);
   color: var(--mantine-color-gray-7);
   cursor: pointer;
   display: block;
   padding: var(--mantine-spacing-lg);
   text-align: center;
   transition:
-    border-color 120ms ease,
-    background 120ms ease;
+    border-color var(--m-out) var(--m-ease),
+    background var(--m-out) var(--m-ease);
   width: 100%;
 }
 
 .image-drop:hover,
 .image-drop[data-dragging='true'] {
-  background: var(--mantine-color-nego-0);
-  border-color: var(--mantine-color-nego-6);
+  background: var(--nego-tint);
+  border-color: var(--nego-accent);
 }
 
 .image-drop:focus-visible {
-  outline: 2px solid var(--mantine-color-nego-8);
+  outline: 2px solid var(--nego-accent);
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .nego-bubble {
-    animation: none;
-  }
-
-  .image-drop {
-    transition: none;
-  }
-}
+/* ── そのほか ─────────────────────────────────────────────────────────────── */
 
 /* 画面には出さず、読み上げソフトにだけ伝える文字 */
 .visually-hidden {
@@ -116,19 +720,26 @@ body {
   width: 1px;
 }
 
-/* ホームの案内の 1 行(行全体がリンク) */
-.onboarding-step {
-  background: var(--mantine-color-white);
-  border: 1px solid var(--mantine-color-nego-2);
-  border-radius: var(--mantine-radius-md);
-  padding: 8px 10px;
-}
+/* OS の設定で「視差効果を減らす」を選んでいる人には、動きをすべて止める(色の変化だけ残す) */
+@media (prefers-reduced-motion: reduce) {
+  .mantine-Button-root,
+  .item-card,
+  .onboarding-step,
+  .photo-frame img,
+  .nav-link::after,
+  .image-drop {
+    transition: none;
+  }
 
-.onboarding-step:hover {
-  border-color: var(--mantine-color-nego-6);
-}
+  .mantine-Button-root:hover,
+  .mantine-Button-root:active,
+  .item-card:hover,
+  .onboarding-step:hover,
+  .item-card:hover .photo-frame img {
+    transform: none !important;
+  }
 
-.onboarding-step:focus-visible {
-  outline: 2px solid var(--mantine-color-nego-8);
-  outline-offset: 2px;
+  .nego-bubble {
+    animation: none;
+  }
 }
